@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Výnos vs. Riziko | investicnitest.cz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0f; }
+    .root {
+      min-height: 100vh;
+      background: #0a0a0f;
+      color: #f0ede8;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .bg-orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.12; pointer-events: none; }
+    .bg-orb-1 { width: 600px; height: 600px; background: #c8a96e; top: -200px; right: -200px; }
+    .bg-orb-2 { width: 400px; height: 400px; background: #4a7c59; bottom: -100px; left: -100px; }
+
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 3rem;
+      backdrop-filter: blur(20px);
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(200,169,110,0.15);
+      border: 1px solid rgba(200,169,110,0.3);
+      border-radius: 100px;
+      padding: 0.4rem 1.2rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c8a96e;
+      margin-bottom: 1rem;
+    }
+    .title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #f0ede8;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+    .title span { color: #c8a96e; }
+    .subtitle { color: rgba(240,237,232,0.5); font-size: 0.9rem; line-height: 1.6; margin-bottom: 2.5rem; }
+
+    /* Asset cards */
+    .assets { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+
+    .asset-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .asset-card:hover {
+      background: rgba(200,169,110,0.06);
+      border-color: rgba(200,169,110,0.25);
+      transform: translateX(4px);
+    }
+    .asset-card.selected {
+      background: rgba(200,169,110,0.1);
+      border-color: #c8a96e;
+    }
+
+    .asset-icon { font-size: 1.5rem; width: 2.5rem; text-align: center; flex-shrink: 0; }
+    .asset-info { flex: 1; }
+    .asset-name { font-weight: 500; color: #f0ede8; font-size: 0.95rem; margin-bottom: 0.2rem; }
+    .asset-desc { color: rgba(240,237,232,0.45); font-size: 0.8rem; }
+
+    .asset-right { text-align: right; flex-shrink: 0; }
+    .asset-return { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #c8a96e; }
+    .asset-risk { font-size: 0.72rem; color: rgba(240,237,232,0.35); margin-top: 0.15rem; }
+
+    /* Risk bar */
+    .risk-bar-wrap { display: flex; gap: 3px; margin-top: 0.4rem; }
+    .risk-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+    /* Detail panel */
+    .detail-panel {
+      background: rgba(200,169,110,0.06);
+      border: 1px solid rgba(200,169,110,0.2);
+      border-radius: 18px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .detail-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #f0ede8;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+    .detail-item { }
+    .detail-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(240,237,232,0.35); margin-bottom: 0.3rem; }
+    .detail-value { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #f0ede8; }
+    .detail-value.gold { color: #c8a96e; }
+
+    .detail-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 1.25rem 0; }
+
+    .detail-pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+    .pros-cons-title { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(240,237,232,0.35); margin-bottom: 0.5rem; }
+    .pros-cons-list { display: flex; flex-direction: column; gap: 0.3rem; }
+    .pros-cons-item { font-size: 0.82rem; color: rgba(240,237,232,0.6); display: flex; gap: 0.4rem; }
+    .pros-cons-item.pro::before { content: "+"; color: #4a7c59; font-weight: 700; }
+    .pros-cons-item.con::before { content: "−"; color: #c0504d; font-weight: 700; }
+
+    .scenario-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+    .scenario-item {
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      padding: 0.875rem;
+      text-align: center;
+    }
+    .scenario-label { font-size: 0.68rem; color: rgba(240,237,232,0.35); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+    .scenario-value { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
+    .scenario-value.bad { color: #c0504d; }
+    .scenario-value.ok { color: rgba(240,237,232,0.7); }
+    .scenario-value.good { color: #4a7c59; }
+
+    .cta-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #c8a96e, #a8894e);
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      color: #0a0a0f;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 1.25rem;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,169,110,0.3); }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .nav-link {
+      flex: 1;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 0.75rem;
+      color: rgba(240,237,232,0.5);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .nav-link:hover { border-color: rgba(255,255,255,0.2); color: #f0ede8; }
+
+    .disclaimer {
+      margin-top: 2rem;
+      color: rgba(240,237,232,0.25);
+      font-size: 0.72rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 2rem 1.5rem; }
+      .detail-pros-cons { grid-template-columns: 1fr; }
+      .title { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const assets = [
+      {
+        id: "sporiak",
+        icon: "🏦",
+        name: "Spořicí účet",
+        desc: "Bankovní produkt, pojištěný stát",
+        returnMin: 3,
+        returnMax: 4,
+        returnTypical: 3.5,
+        risk: 1,
+        riskLabel: "Žádné",
+        pros: ["Pojištěno do 100 000 €", "Okamžitá likvidita", "Žádné znalosti nutné"],
+        cons: ["Výnos pod inflací", "Peníze reálně ztrácí hodnotu", "Žádný růstový potenciál"],
+        scenarioBad: "+2 %",
+        scenarioOk: "+3,5 %",
+        scenarioGood: "+4 %",
+        note: "Vhodné jako finanční rezerva (3–6 měsíců výdajů), ne jako investice.",
+      },
+      {
+        id: "dluhopisy",
+        icon: "📄",
+        name: "Dluhopisy / konzervativní portfolio",
+        desc: "Státní dluhopisy, smíšené fondy",
+        returnMin: 4,
+        returnMax: 6,
+        returnTypical: 5,
+        risk: 2,
+        riskLabel: "Nízké",
+        pros: ["Stabilní výnosy", "Nižší volatilita než akcie", "Diverzifikace portfolia"],
+        cons: ["Nižší výnos než akcie", "Citlivost na úrokové sazby", "Inflační riziko"],
+        scenarioBad: "+1 %",
+        scenarioOk: "+5 %",
+        scenarioGood: "+7 %",
+        note: "Vhodné pro kratší horizont (2–5 let) nebo jako část konzervativního portfolia.",
+      },
+      {
+        id: "etf",
+        icon: "📊",
+        name: "ETF — globální index",
+        desc: "S&P 500, MSCI World, celosvětová diverzifikace",
+        returnMin: 7,
+        returnMax: 10,
+        returnTypical: 8,
+        risk: 3,
+        riskLabel: "Střední",
+        pros: ["Historicky nejlepší poměr výnos/riziko", "Automatická diverzifikace", "Nízké poplatky"],
+        cons: ["Krátkodobé poklesy až −40 %", "Vyžaduje dlouhý horizont (5+ let)", "Výnos není zaručen"],
+        scenarioBad: "−15 %",
+        scenarioOk: "+8 %",
+        scenarioGood: "+20 %",
+        note: "Zlatý standard pasivního investování. Doporučený horizont 10+ let.",
+      },
+      {
+        id: "akcie",
+        icon: "📈",
+        name: "Jednotlivé akcie",
+        desc: "Výběr konkrétních firem — Apple, NVIDIA...",
+        returnMin: 0,
+        returnMax: 30,
+        returnTypical: 10,
+        risk: 4,
+        riskLabel: "Vysoké",
+        pros: ["Potenciál výrazně překonat trh", "Přímé vlastnictví firmy", "Dividendy u vybraných akcií"],
+        cons: ["Vysoké riziko jednotlivé firmy", "Vyžaduje znalosti a čas", "Emocionálně náročné"],
+        scenarioBad: "−50 %",
+        scenarioOk: "+10 %",
+        scenarioGood: "+40 %",
+        note: "Vhodné jako doplněk k ETF portfoliu, ne jako základ. Nikdy ne více než 20 % portfolia pro začátečníky.",
+      },
+      {
+        id: "krypto",
+        icon: "₿",
+        name: "Kryptoměny",
+        desc: "Bitcoin, Ethereum a další digitální aktiva",
+        returnMin: -80,
+        returnMax: 200,
+        returnTypical: 15,
+        risk: 5,
+        riskLabel: "Velmi vysoké",
+        pros: ["Potenciál extrémních výnosů", "Decentralizace", "Likvidita 24/7"],
+        cons: ["Extrémní volatilita", "Regulatorní nejistota", "Žádná vnitřní hodnota u většiny"],
+        scenarioBad: "−80 %",
+        scenarioOk: "+15 %",
+        scenarioGood: "+200 %",
+        note: "Pouze pro zkušené investory. Nikdy nevkládej více než si můžeš dovolit zcela ztratit.",
+      },
+    ];
+
+    const riskColors = ["", "#4a7c59", "#7ab87a", "#c8a96e", "#e07a3a", "#c0504d"];
+
+    function RiskDots({ level }) {
+      return (
+        <div className="risk-bar-wrap">
+          {[1,2,3,4,5].map(i => (
+            <div key={i} className="risk-dot" style={{
+              background: i <= level ? riskColors[level] : 'rgba(255,255,255,0.1)'
+            }} />
+          ))}
+        </div>
+      );
+    }
+
+    function App() {
+      const [selected, setSelected] = useState(null);
+      const asset = assets.find(a => a.id === selected);
+
+      const calcUrl = asset
+        ? `kalkulacka.html?rate=${asset.returnTypical}`
+        : 'kalkulacka.html';
+
+      return (
+        <div className="root">
+          <div className="bg-orb bg-orb-1" />
+          <div className="bg-orb bg-orb-2" />
+          <div className="card">
+            <div className="badge">Průvodce výnosem</div>
+            <h1 className="title">Kolik % výnosu<br /><span>reálně čekat?</span></h1>
+            <p className="subtitle">Vyber typ investice a zjisti realistický výnos který pak dosadíš do kalkulačky.</p>
+
+            <div className="assets">
+              {assets.map(a => (
+                <div
+                  key={a.id}
+                  className={`asset-card${selected === a.id ? ' selected' : ''}`}
+                  onClick={() => setSelected(selected === a.id ? null : a.id)}
+                >
+                  <div className="asset-icon">{a.icon}</div>
+                  <div className="asset-info">
+                    <div className="asset-name">{a.name}</div>
+                    <div className="asset-desc">{a.desc}</div>
+                    <RiskDots level={a.risk} />
+                  </div>
+                  <div className="asset-right">
+                    <div className="asset-return">{a.returnMin < 0 ? a.returnMin : a.returnMin}–{a.returnMax} %</div>
+                    <div className="asset-risk">Riziko: {a.riskLabel}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {asset && (
+              <div className="detail-panel">
+                <div className="detail-title">
+                  <span>{asset.icon}</span>
+                  {asset.name}
+                </div>
+
+                <div className="detail-grid">
+                  <div className="detail-item">
+                    <div className="detail-label">Typický roční výnos</div>
+                    <div className="detail-value gold">~{asset.returnTypical} % p.a.</div>
+                  </div>
+                  <div className="detail-item">
+                    <div className="detail-label">Rozsah výnosu</div>
+                    <div className="detail-value">{asset.returnMin} – {asset.returnMax} %</div>
+                  </div>
+                </div>
+
+                <div className="detail-divider" />
+
+                <div className="detail-pros-cons">
+                  <div>
+                    <div className="pros-cons-title">Výhody</div>
+                    <div className="pros-cons-list">
+                      {asset.pros.map((p, i) => <div key={i} className="pros-cons-item pro">{p}</div>)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="pros-cons-title">Nevýhody</div>
+                    <div className="pros-cons-list">
+                      {asset.cons.map((c, i) => <div key={i} className="pros-cons-item con">{c}</div>)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="detail-divider" />
+
+                <div style={{marginBottom: '0.5rem'}}>
+                  <div className="pros-cons-title" style={{marginBottom: '0.75rem'}}>Scénáře — co se může stát za rok</div>
+                  <div className="scenario-row">
+                    <div className="scenario-item">
+                      <div className="scenario-label">Špatný rok</div>
+                      <div className="scenario-value bad">{asset.scenarioBad}</div>
+                    </div>
+                    <div className="scenario-item">
+                      <div className="scenario-label">Průměrný rok</div>
+                      <div className="scenario-value ok">{asset.scenarioOk}</div>
+                    </div>
+                    <div className="scenario-item">
+                      <div className="scenario-label">Dobrý rok</div>
+                      <div className="scenario-value good">{asset.scenarioGood}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="detail-divider" />
+
+                <div style={{color: 'rgba(240,237,232,0.45)', fontSize: '0.82rem', lineHeight: '1.6', marginBottom: '0.5rem'}}>
+                  💡 {asset.note}
+                </div>
+
+                <a className="cta-btn" href={`kalkulacka.html`}>
+                  Dosadit {asset.returnTypical} % do kalkulačky →
+                </a>
+              </div>
+            )}
+
+            <div className="nav-links">
+              <a className="nav-link" href="index.html">← Investiční kvíz</a>
+              <a className="nav-link" href="kalkulacka.html">Kalkulačka složeného úročení →</a>
+            </div>
+
+            <div className="disclaimer">
+              Uvedené výnosy jsou historické průměry a orientační odhady. Minulé výnosy nezaručují výnosy budoucí. Investování je spojeno s rizikem ztráty vložených prostředků. Neposkytujeme investiční poradenství ve smyslu zákona č. 256/2004 Sb.
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
