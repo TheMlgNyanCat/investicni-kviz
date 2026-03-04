@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalkulačka složeného úročení | investicnitest.cz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0f; }
+
+    .root {
+      min-height: 100vh;
+      background: #0a0a0f;
+      color: #f0ede8;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .bg-orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.12; pointer-events: none; }
+    .bg-orb-1 { width: 600px; height: 600px; background: #c8a96e; top: -200px; right: -200px; }
+    .bg-orb-2 { width: 400px; height: 400px; background: #4a7c59; bottom: -100px; left: -100px; }
+
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 3rem;
+      backdrop-filter: blur(20px);
+    }
+
+    .header { margin-bottom: 2.5rem; }
+    .badge {
+      display: inline-block;
+      background: rgba(200,169,110,0.15);
+      border: 1px solid rgba(200,169,110,0.3);
+      border-radius: 100px;
+      padding: 0.4rem 1.2rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c8a96e;
+      margin-bottom: 1rem;
+    }
+    .title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #f0ede8;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+    .title span { color: #c8a96e; }
+    .subtitle { color: rgba(240,237,232,0.5); font-size: 0.9rem; line-height: 1.6; }
+
+    .inputs { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 2rem; }
+
+    .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .input-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(240,237,232,0.4);
+      font-weight: 500;
+    }
+    .input-row { display: flex; align-items: center; gap: 0.75rem; }
+    .input-field {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 0.875rem 1.25rem;
+      color: #f0ede8;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      -moz-appearance: textfield;
+    }
+    .input-field::-webkit-outer-spin-button,
+    .input-field::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .input-field:focus { border-color: rgba(200,169,110,0.5); }
+    .input-unit {
+      color: rgba(240,237,232,0.4);
+      font-size: 0.85rem;
+      min-width: 2.5rem;
+      text-align: right;
+    }
+
+    .slider-wrap { display: flex; flex-direction: column; gap: 0.5rem; }
+    .slider-row { display: flex; align-items: center; gap: 1rem; }
+    .slider {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
+      outline: none;
+      cursor: pointer;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #c8a96e;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(200,169,110,0.4);
+    }
+    .slider-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #c8a96e;
+      min-width: 3.5rem;
+      text-align: right;
+    }
+
+    /* Results */
+    .results {
+      background: rgba(200,169,110,0.06);
+      border: 1px solid rgba(200,169,110,0.15);
+      border-radius: 18px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+    }
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .result-item { text-align: center; }
+    .result-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #f0ede8;
+      margin-bottom: 0.25rem;
+      line-height: 1;
+    }
+    .result-value.highlight { color: #c8a96e; font-size: 1.7rem; }
+    .result-label { font-size: 0.72rem; color: rgba(240,237,232,0.4); letter-spacing: 0.05em; }
+
+    .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 1.25rem 0; }
+
+    /* Chart */
+    .chart-wrap { position: relative; height: 140px; margin-top: 0.5rem; }
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 100%;
+      padding-bottom: 24px;
+    }
+    .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0; position: relative; }
+    .bar-invested {
+      width: 100%;
+      background: rgba(255,255,255,0.15);
+      border-radius: 3px 3px 0 0;
+      transition: height 0.3s ease;
+    }
+    .bar-profit {
+      width: 100%;
+      background: linear-gradient(180deg, #c8a96e, #a8894e);
+      border-radius: 3px 3px 0 0;
+      transition: height 0.3s ease;
+    }
+    .bar-label {
+      position: absolute;
+      bottom: -22px;
+      font-size: 0.65rem;
+      color: rgba(240,237,232,0.3);
+      white-space: nowrap;
+    }
+    .chart-legend {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 2rem;
+      justify-content: center;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: rgba(240,237,232,0.5); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+    .cta-section {
+      text-align: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .cta-text { color: rgba(240,237,232,0.5); font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.6; }
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #c8a96e, #a8894e);
+      border: none;
+      border-radius: 12px;
+      padding: 0.9rem 2rem;
+      color: #0a0a0f;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,169,110,0.3); }
+
+    .disclaimer {
+      margin-top: 2rem;
+      color: rgba(240,237,232,0.25);
+      font-size: 0.72rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 2rem 1.5rem; }
+      .results-grid { grid-template-columns: 1fr 1fr; }
+      .result-item:last-child { grid-column: span 2; }
+      .title { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+
+    function formatCZK(value) {
+      if (value >= 1000000) return (value / 1000000).toFixed(1).replace('.', ',') + ' mil. Kč';
+      return Math.round(value).toLocaleString('cs-CZ') + ' Kč';
+    }
+
+    function calculate(monthly, years, rate) {
+      const monthlyRate = rate / 100 / 12;
+      const months = years * 12;
+      let total = 0;
+      for (let i = 0; i < months; i++) {
+        total = (total + monthly) * (1 + monthlyRate);
+      }
+      const invested = monthly * months;
+      const profit = total - invested;
+      return { total, invested, profit };
+    }
+
+    function App() {
+      const [monthly, setMonthly] = useState(2000);
+      const [years, setYears] = useState(20);
+      const [rate, setRate] = useState(7);
+
+      const result = useMemo(() => calculate(monthly, years, rate), [monthly, years, rate]);
+
+      // Chart data — every 5 years or evenly distributed
+      const chartPoints = useMemo(() => {
+        const points = [];
+        const step = Math.max(1, Math.floor(years / 8));
+        for (let y = step; y <= years; y += step) {
+          const r = calculate(monthly, y, rate);
+          points.push({ year: y, ...r });
+        }
+        if (points[points.length - 1]?.year !== years) {
+          points.push({ year: years, ...result });
+        }
+        return points;
+      }, [monthly, years, rate, result]);
+
+      const maxTotal = Math.max(...chartPoints.map(p => p.total), 1);
+
+      return (
+        <div className="root">
+          <div className="bg-orb bg-orb-1" />
+          <div className="bg-orb bg-orb-2" />
+          <div className="card">
+            <div className="header">
+              <div className="badge">Kalkulačka</div>
+              <h1 className="title">Jak moc vydělá<br /><span>složené úročení?</span></h1>
+              <p className="subtitle">Uprav parametry a sleduj jak roste tvůj majetek v čase — bez jediné akcie navíc.</p>
+            </div>
+
+            <div className="inputs">
+              <div className="input-group">
+                <div className="input-label">Měsíční investice</div>
+                <div className="input-row">
+                  <input
+                    className="input-field"
+                    type="number"
+                    value={monthly}
+                    min={100}
+                    max={100000}
+                    step={100}
+                    onChange={e => setMonthly(Math.max(0, Number(e.target.value)))}
+                  />
+                  <span className="input-unit">Kč</span>
+                </div>
+              </div>
+
+              <div className="input-group">
+                <div className="input-label">Investiční horizont — {years} let</div>
+                <div className="slider-wrap">
+                  <div className="slider-row">
+                    <input className="slider" type="range" min={1} max={40} value={years}
+                      onChange={e => setYears(Number(e.target.value))}
+                      style={{ background: `linear-gradient(to right, #c8a96e ${(years-1)/39*100}%, rgba(255,255,255,0.1) ${(years-1)/39*100}%)` }}
+                    />
+                    <span className="slider-value">{years} let</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="input-group">
+                <div className="input-label">Průměrný roční výnos — {rate} %</div>
+                <div className="slider-wrap">
+                  <div className="slider-row">
+                    <input className="slider" type="range" min={1} max={15} step={0.5} value={rate}
+                      onChange={e => setRate(Number(e.target.value))}
+                      style={{ background: `linear-gradient(to right, #c8a96e ${(rate-1)/14*100}%, rgba(255,255,255,0.1) ${(rate-1)/14*100}%)` }}
+                    />
+                    <span className="slider-value">{rate} %</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="results">
+              <div className="results-grid">
+                <div className="result-item">
+                  <div className="result-value">{formatCZK(result.invested)}</div>
+                  <div className="result-label">Vloženo celkem</div>
+                </div>
+                <div className="result-item">
+                  <div className="result-value" style={{color: '#4a7c59'}}>{formatCZK(result.profit)}</div>
+                  <div className="result-label">Výnos z úroků</div>
+                </div>
+                <div className="result-item">
+                  <div className="result-value highlight">{formatCZK(result.total)}</div>
+                  <div className="result-label">Celková hodnota</div>
+                </div>
+              </div>
+
+              <div className="divider" />
+
+              <div className="chart-wrap">
+                <div className="chart-bars">
+                  {chartPoints.map((p, i) => {
+                    const totalH = (p.total / maxTotal) * 100;
+                    const investedH = (p.invested / maxTotal) * 100;
+                    const profitH = totalH - investedH;
+                    return (
+                      <div key={i} className="bar-group" style={{height: '100%'}}>
+                        <div style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', width: '100%'}}>
+                          <div className="bar-profit" style={{height: `${profitH}%`}} />
+                          <div className="bar-invested" style={{height: `${investedH}%`}} />
+                        </div>
+                        <div className="bar-label">{p.year}r</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="chart-legend">
+                <div className="legend-item">
+                  <div className="legend-dot" style={{background: 'rgba(255,255,255,0.15)'}} />
+                  Vloženo
+                </div>
+                <div className="legend-item">
+                  <div className="legend-dot" style={{background: '#c8a96e'}} />
+                  Výnos z úroků
+                </div>
+              </div>
+            </div>
+
+            <div className="cta-section">
+              <p className="cta-text">Víš kolik chceš investovat — ale nevíš kam? Zjisti jaká platforma sedí přesně na tebe.</p>
+              <a className="cta-btn" href="https://www.investicnitest.cz">Udělat investiční kvíz →</a>
+            </div>
+
+            <div className="disclaimer">
+              Kalkulačka slouží pouze pro ilustraci principu složeného úročení. Výsledky jsou orientační a nezaručují skutečný výnos. Investování je spojeno s rizikem ztráty vložených prostředků. Neposkytujeme investiční poradenství ve smyslu zákona č. 256/2004 Sb.
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
