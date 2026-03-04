@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>investicnitest.cz | Kde začít investovat?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0f; color: #f0ede8; font-family: 'DM Sans', sans-serif; }
+
+    .bg-orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.12; pointer-events: none; z-index: 0; }
+    .bg-orb-1 { width: 600px; height: 600px; background: #c8a96e; top: -200px; right: -200px; }
+    .bg-orb-2 { width: 400px; height: 400px; background: #4a7c59; bottom: -100px; left: -100px; }
+    .bg-orb-3 { width: 350px; height: 350px; background: #c8a96e; top: 60%; left: 20%; opacity: 0.05; }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10,10,15,0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f0ede8;
+      text-decoration: none;
+    }
+    .nav-logo span { color: #c8a96e; }
+    .nav-links { display: flex; gap: 0.5rem; }
+    .nav-link {
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: rgba(240,237,232,0.55);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-link:hover { color: #f0ede8; background: rgba(255,255,255,0.05); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-inner { max-width: 680px; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(200,169,110,0.12);
+      border: 1px solid rgba(200,169,110,0.25);
+      border-radius: 100px;
+      padding: 0.45rem 1.25rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #c8a96e;
+      margin-bottom: 2rem;
+    }
+    .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #c8a96e; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      color: #f0ede8;
+      margin-bottom: 1.5rem;
+    }
+    .hero-title span { color: #c8a96e; }
+    .hero-desc {
+      color: rgba(240,237,232,0.5);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-cta-row { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: linear-gradient(135deg, #c8a96e, #a8894e);
+      border: none;
+      border-radius: 14px;
+      padding: 1rem 2.25rem;
+      color: #0a0a0f;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      display: inline-block;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(200,169,110,0.35); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 1rem 2.25rem;
+      color: rgba(240,237,232,0.7);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      display: inline-block;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.2); color: #f0ede8; }
+
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+    }
+    .stat-item { text-align: center; }
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #c8a96e;
+    }
+    .stat-label { font-size: 0.78rem; color: rgba(240,237,232,0.35); margin-top: 0.2rem; }
+
+    /* TOOLS SECTION */
+    .tools-section {
+      padding: 6rem 2rem;
+      position: relative;
+      z-index: 1;
+    }
+    .section-label {
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #c8a96e;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 900;
+      text-align: center;
+      color: #f0ede8;
+      margin-bottom: 0.75rem;
+    }
+    .section-sub {
+      text-align: center;
+      color: rgba(240,237,232,0.45);
+      font-size: 0.95rem;
+      margin-bottom: 3rem;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .tool-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 2rem;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .tool-card:hover {
+      background: rgba(200,169,110,0.07);
+      border-color: rgba(200,169,110,0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    .tool-card.featured {
+      border-color: rgba(200,169,110,0.3);
+      background: rgba(200,169,110,0.06);
+    }
+    .tool-icon-wrap {
+      width: 48px;
+      height: 48px;
+      background: rgba(200,169,110,0.12);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    .tool-tag {
+      display: inline-block;
+      background: rgba(200,169,110,0.15);
+      border-radius: 100px;
+      padding: 0.2rem 0.75rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #c8a96e;
+      margin-left: auto;
+    }
+    .tool-header { display: flex; align-items: center; }
+    .tool-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #f0ede8;
+      margin-bottom: 0.4rem;
+    }
+    .tool-desc { color: rgba(240,237,232,0.5); font-size: 0.85rem; line-height: 1.6; }
+    .tool-meta {
+      display: flex;
+      gap: 1rem;
+      margin-top: auto;
+      padding-top: 0.5rem;
+    }
+    .tool-meta-item { font-size: 0.75rem; color: rgba(240,237,232,0.3); display: flex; align-items: center; gap: 0.3rem; }
+
+    /* WHY SECTION */
+    .why-section {
+      padding: 4rem 2rem 6rem;
+      position: relative;
+      z-index: 1;
+    }
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      max-width: 900px;
+      margin: 3rem auto 0;
+    }
+    .why-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .why-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .why-title { font-weight: 500; color: #f0ede8; font-size: 0.95rem; margin-bottom: 0.4rem; }
+    .why-desc { color: rgba(240,237,232,0.4); font-size: 0.82rem; line-height: 1.5; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: rgba(240,237,232,0.4);
+      margin-bottom: 1rem;
+    }
+    .footer-logo span { color: #c8a96e; }
+    .footer-links { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .footer-link { font-size: 0.82rem; color: rgba(240,237,232,0.35); text-decoration: none; transition: color 0.2s; }
+    .footer-link:hover { color: #f0ede8; }
+    .footer-disclaimer {
+      color: rgba(240,237,232,0.2);
+      font-size: 0.72rem;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+
+  <nav>
+    <a href="/" class="nav-logo">investicni<span>test</span>.cz</a>
+    <div class="nav-links">
+      <a href="/kviz" class="nav-link">Kvíz</a>
+      <a href="/kalkulacka" class="nav-link">Kalkulačka</a>
+      <a href="/vynos" class="nav-link">Výnos vs riziko</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        Zdarma · Bez registrace
+      </div>
+      <h1 class="hero-title">Kde začít<br /><span>investovat?</span></h1>
+      <p class="hero-desc">Jednoduché nástroje které ti za pár minut řeknou vše co potřebuješ vědět — bez finančního žargonu a bez obecných rad.</p>
+      <div class="hero-cta-row">
+        <a href="/kviz" class="btn-primary">Udělat investiční kvíz →</a>
+        <a href="/kalkulacka" class="btn-secondary">Kalkulačka výnosu</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-value">5</div>
+          <div class="stat-label">otázek v kvízu</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">3</div>
+          <div class="stat-label">bezplatné nástroje</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">2 min</div>
+          <div class="stat-label">průměrná doba</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tools-section">
+    <div class="section-label">Nástroje</div>
+    <h2 class="section-title">Vše co potřebuješ</h2>
+    <p class="section-sub">Tři nástroje které tě provedou od nuly až po první investici.</p>
+
+    <div class="tools-grid">
+      <a href="/kviz" class="tool-card featured">
+        <div class="tool-header">
+          <div class="tool-icon-wrap">📊</div>
+          <div class="tool-tag">Začni zde</div>
+        </div>
+        <div>
+          <div class="tool-name">Investiční kvíz</div>
+          <div class="tool-desc">5 otázek o tvé situaci, rizikové toleranci a cílech. Dostaneš konkrétní doporučení platformy přesně pro tebe.</div>
+        </div>
+        <div class="tool-meta">
+          <div class="tool-meta-item">⏱ 2 minuty</div>
+          <div class="tool-meta-item">✓ Zdarma</div>
+        </div>
+      </a>
+
+      <a href="/kalkulacka" class="tool-card">
+        <div class="tool-header">
+          <div class="tool-icon-wrap">📈</div>
+        </div>
+        <div>
+          <div class="tool-name">Kalkulačka výnosu</div>
+          <div class="tool-desc">Jak moc vydělá složené úročení? Zadej měsíční částku, horizont a výnos — uvidíš graf růstu v čase.</div>
+        </div>
+        <div class="tool-meta">
+          <div class="tool-meta-item">⏱ 1 minuta</div>
+          <div class="tool-meta-item">✓ Interaktivní</div>
+        </div>
+      </a>
+
+      <a href="/vynos" class="tool-card">
+        <div class="tool-header">
+          <div class="tool-icon-wrap">⚖️</div>
+        </div>
+        <div>
+          <div class="tool-name">Výnos vs. Riziko</div>
+          <div class="tool-desc">Spořák, ETF, akcie nebo krypto? Porovnej realistické výnosy a rizika různých typů investic.</div>
+        </div>
+        <div class="tool-meta">
+          <div class="tool-meta-item">⏱ 3 minuty</div>
+          <div class="tool-meta-item">✓ Přehledně</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="why-section">
+    <div class="section-label">Proč investicnitest.cz</div>
+    <h2 class="section-title">Bez bullshitu</h2>
+    <div class="why-grid">
+      <div class="why-item">
+        <div class="why-icon">🎯</div>
+        <div class="why-title">Konkrétní doporučení</div>
+        <div class="why-desc">Žádné obecné rady. Výsledky jsou přizpůsobené přesně tvé situaci.</div>
+      </div>
+      <div class="why-item">
+        <div class="why-icon">🔒</div>
+        <div class="why-title">Bez registrace</div>
+        <div class="why-desc">Žádný email, žádné osobní údaje. Prostě přijdeš a použiješ.</div>
+      </div>
+      <div class="why-item">
+        <div class="why-icon">💰</div>
+        <div class="why-title">Zdarma</div>
+        <div class="why-desc">Všechny nástroje jsou a vždy budou zdarma.</div>
+      </div>
+      <div class="why-item">
+        <div class="why-icon">📚</div>
+        <div class="why-title">Edukační obsah</div>
+        <div class="why-desc">Vysvětlujeme pojmy srozumitelně — bez finančního žargonu.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">investicni<span>test</span>.cz</div>
+    <div class="footer-links">
+      <a href="/kviz" class="footer-link">Investiční kvíz</a>
+      <a href="/kalkulacka" class="footer-link">Kalkulačka</a>
+      <a href="/vynos" class="footer-link">Výnos vs riziko</a>
+    </div>
+    <div class="footer-disclaimer">
+      Obsah tohoto webu má pouze informační a edukační charakter. Neposkytujeme investiční poradenství ve smyslu zákona č. 256/2004 Sb. o podnikání na kapitálovém trhu. Před jakýmkoliv investičním rozhodnutím doporučujeme konzultaci s licencovaným odborníkem. Investování je spojeno s rizikem ztráty vložených prostředků.
+    </div>
+  </footer>
+</body>
+</html>
