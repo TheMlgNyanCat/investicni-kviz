@@ -1,5 +1,6 @@
 {
   "rewrites": [
     { "source": "/kalkulacka", "destination": "/kalkulacka.html" }
+    { "source": "/vynos", "destination": "/vynos.html" }
   ]
 }
