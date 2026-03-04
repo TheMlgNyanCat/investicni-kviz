@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kde začít investovat? | Investiční kvíz</title>
+  <title>Investiční kvíz | investicnitest.cz</title>
+  <meta name="description" content="5 otázek a dostaneš konkrétní doporučení investiční platformy přesně pro tvou situaci. Zdarma, bez registrace." />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -11,6 +12,21 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #0a0a0f; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(10,10,15,0.8); backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: #f0ede8; text-decoration: none; }
+    .nav-logo span { color: #c8a96e; }
+    .nav-links { display: flex; gap: 0.25rem; }
+    .nav-link { padding: 0.4rem 0.75rem; border-radius: 8px; font-size: 0.8rem; color: rgba(240,237,232,0.5); text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+    .nav-link:hover { color: #f0ede8; background: rgba(255,255,255,0.05); }
+    .nav-link.active { color: #c8a96e; }
 
     .quiz-root {
       min-height: 100vh;
@@ -20,316 +36,137 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
+      padding: 6rem 1.25rem 2rem;
       position: relative;
       overflow: hidden;
     }
-    .bg-orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.12;
-      pointer-events: none;
-    }
+    .bg-orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.12; pointer-events: none; }
     .bg-orb-1 { width: 600px; height: 600px; background: #c8a96e; top: -200px; right: -200px; }
     .bg-orb-2 { width: 400px; height: 400px; background: #4a7c59; bottom: -100px; left: -100px; }
-    .bg-orb-3 { width: 300px; height: 300px; background: #c8a96e; top: 50%; left: 30%; opacity: 0.06; }
 
     .quiz-card {
-      width: 100%;
-      max-width: 640px;
+      width: 100%; max-width: 580px;
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
-      padding: 3rem;
-      position: relative;
-      backdrop-filter: blur(20px);
+      border-radius: 24px; padding: 2rem;
+      position: relative; backdrop-filter: blur(20px);
     }
-    .progress-bar-wrap {
-      height: 2px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 2px;
-      margin-bottom: 2.5rem;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #c8a96e, #e8c98e);
-      border-radius: 2px;
-      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
-    }
-    .step-label {
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #c8a96e;
-      margin-bottom: 0.75rem;
-      font-weight: 500;
-    }
-    .question-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.9rem;
-      font-weight: 700;
-      line-height: 1.25;
-      color: #f0ede8;
-      margin-bottom: 2rem;
-    }
-    .options-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 2rem;
-    }
+    @media (min-width: 480px) { .quiz-card { padding: 2.5rem; } }
+
+    .progress-bar-wrap { height: 2px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-bottom: 2rem; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #c8a96e, #e8c98e); border-radius: 2px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+    .step-label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #c8a96e; margin-bottom: 0.75rem; font-weight: 500; }
+    .question-title { font-family: 'Playfair Display', serif; font-size: clamp(1.4rem, 4vw, 1.9rem); font-weight: 700; line-height: 1.25; color: #f0ede8; margin-bottom: 1.5rem; }
+
+    .options-grid { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.5rem; }
     .option-btn {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 14px;
-      padding: 1rem 1.25rem;
-      color: #d4cfc8;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; padding: 0.875rem 1.25rem;
+      color: #d4cfc8; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+      cursor: pointer; text-align: left; transition: all 0.2s ease;
+      display: flex; align-items: center; gap: 0.875rem;
     }
-    .option-btn:hover {
-      background: rgba(200,169,110,0.1);
-      border-color: rgba(200,169,110,0.4);
-      color: #f0ede8;
-      transform: translateX(4px);
-    }
-    .option-btn.selected {
-      background: rgba(200,169,110,0.15);
-      border-color: #c8a96e;
-      color: #f0ede8;
-    }
-    .option-icon { font-size: 1.2rem; width: 2rem; text-align: center; flex-shrink: 0; }
-    .nav-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 1rem;
-    }
-    .btn-back {
-      background: none;
-      border: none;
-      color: rgba(240,237,232,0.4);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
-      cursor: pointer;
-      padding: 0.5rem 0;
-      transition: color 0.2s;
-    }
+    .option-btn:hover { background: rgba(200,169,110,0.1); border-color: rgba(200,169,110,0.4); color: #f0ede8; }
+    .option-btn.selected { background: rgba(200,169,110,0.15); border-color: #c8a96e; color: #f0ede8; }
+    .option-icon { font-size: 1.1rem; width: 1.75rem; text-align: center; flex-shrink: 0; }
+
+    .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
+    .btn-back { background: none; border: none; color: rgba(240,237,232,0.4); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; cursor: pointer; padding: 0.5rem 0; transition: color 0.2s; }
     .btn-back:hover { color: #f0ede8; }
-    .btn-next {
-      background: linear-gradient(135deg, #c8a96e, #a8894e);
-      border: none;
-      border-radius: 12px;
-      padding: 0.9rem 2rem;
-      color: #0a0a0f;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+    .btn-next { background: linear-gradient(135deg, #c8a96e, #a8894e); border: none; border-radius: 12px; padding: 0.875rem 1.75rem; color: #0a0a0f; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
     .btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,169,110,0.3); }
     .btn-next:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .results-header { text-align: center; margin-bottom: 2.5rem; }
-    .results-badge {
-      display: inline-block;
-      background: rgba(200,169,110,0.15);
-      border: 1px solid rgba(200,169,110,0.3);
-      border-radius: 100px;
-      padding: 0.4rem 1.2rem;
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #c8a96e;
-      margin-bottom: 1.25rem;
-    }
-    .results-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
-      font-weight: 900;
-      color: #f0ede8;
-      margin-bottom: 0.75rem;
-    }
-    .results-subtitle {
-      color: rgba(240,237,232,0.5);
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
-    .platforms-title {
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(240,237,232,0.4);
-      margin-bottom: 1rem;
-    }
-    .platform-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 1.25rem 1.5rem;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      transition: all 0.2s ease;
-      text-decoration: none;
-      color: inherit;
-      cursor: pointer;
-    }
+    /* Intro */
+    .intro-section { text-align: center; padding: 0.5rem 0; }
+    .intro-icon { font-size: 2.25rem; margin-bottom: 1.25rem; }
+    .intro-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 5vw, 2.4rem); font-weight: 900; color: #f0ede8; margin-bottom: 0.875rem; line-height: 1.2; }
+    .intro-title span { color: #c8a96e; }
+    .intro-desc { color: rgba(240,237,232,0.55); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.75rem; }
+    .intro-meta { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+    .meta-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: rgba(240,237,232,0.4); }
+    .meta-dot { width: 4px; height: 4px; border-radius: 50%; background: #c8a96e; flex-shrink: 0; }
+    .btn-start { background: linear-gradient(135deg, #c8a96e, #a8894e); border: none; border-radius: 14px; padding: 1rem 2.5rem; color: #0a0a0f; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+    .btn-start:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(200,169,110,0.35); }
+
+    /* Results */
+    .results-header { text-align: center; margin-bottom: 2rem; }
+    .results-badge { display: inline-block; background: rgba(200,169,110,0.15); border: 1px solid rgba(200,169,110,0.3); border-radius: 100px; padding: 0.4rem 1.2rem; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: #c8a96e; margin-bottom: 1rem; }
+    .results-title { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 900; color: #f0ede8; margin-bottom: 0.75rem; }
+    .results-subtitle { color: rgba(240,237,232,0.5); font-size: 0.88rem; line-height: 1.6; }
+
+    .platforms-title { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,237,232,0.4); margin-bottom: 0.875rem; }
+    .platform-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 0.65rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; transition: all 0.2s ease; text-decoration: none; color: inherit; }
     .platform-card:hover { border-color: rgba(200,169,110,0.3); background: rgba(200,169,110,0.05); }
     .platform-card.primary { border-color: rgba(200,169,110,0.4); background: rgba(200,169,110,0.08); }
-    .platform-info { flex: 1; }
-    .platform-name { font-weight: 500; color: #f0ede8; font-size: 1rem; margin-bottom: 0.25rem; }
-    .platform-desc { color: rgba(240,237,232,0.5); font-size: 0.82rem; line-height: 1.4; }
-    .platform-tag {
-      font-size: 0.7rem;
-      padding: 0.3rem 0.8rem;
-      border-radius: 100px;
-      font-weight: 500;
-      white-space: nowrap;
-    }
+    .platform-info { flex: 1; min-width: 0; }
+    .platform-name { font-weight: 500; color: #f0ede8; font-size: 0.95rem; margin-bottom: 0.2rem; }
+    .platform-desc { color: rgba(240,237,232,0.5); font-size: 0.78rem; line-height: 1.4; }
+    .platform-tag { font-size: 0.68rem; padding: 0.25rem 0.7rem; border-radius: 100px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
     .tag-top { background: rgba(200,169,110,0.2); color: #c8a96e; }
     .tag-alt { background: rgba(255,255,255,0.06); color: rgba(240,237,232,0.5); }
 
-    .btn-restart {
-      background: none;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 0.75rem 1.5rem;
-      color: rgba(240,237,232,0.5);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      cursor: pointer;
-      margin-top: 1.5rem;
-      width: 100%;
-      transition: all 0.2s;
-    }
-    .btn-restart:hover { border-color: rgba(255,255,255,0.2); color: #f0ede8; }
+    /* Post-quiz tools */
+    .tools-cta { margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .tools-cta-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.35); margin-bottom: 0.875rem; }
+    .tools-cta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+    .tool-cta-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.875rem 1rem; text-decoration: none; color: inherit; transition: all 0.2s; display: flex; align-items: center; gap: 0.6rem; }
+    .tool-cta-card:hover { border-color: rgba(200,169,110,0.25); background: rgba(200,169,110,0.05); }
+    .tool-cta-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .tool-cta-text { font-size: 0.78rem; color: rgba(240,237,232,0.6); line-height: 1.3; }
+    .tool-cta-name { font-size: 0.85rem; font-weight: 500; color: #f0ede8; margin-bottom: 0.1rem; }
 
-    .disclaimer {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      color: rgba(240,237,232,0.3);
-      font-size: 0.75rem;
-      line-height: 1.6;
-      text-align: center;
-    }
-    .intro-section { text-align: center; padding: 1rem 0; }
-    .intro-icon { font-size: 2.5rem; margin-bottom: 1.5rem; }
-    .intro-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.4rem;
-      font-weight: 900;
-      color: #f0ede8;
-      margin-bottom: 1rem;
-      line-height: 1.2;
-    }
-    .intro-title span { color: #c8a96e; }
-    .intro-desc {
-      color: rgba(240,237,232,0.55);
-      font-size: 0.95rem;
-      line-height: 1.7;
-      margin-bottom: 2rem;
-      max-width: 440px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .intro-meta {
-      display: flex;
-      gap: 1.5rem;
-      justify-content: center;
-      margin-bottom: 2.5rem;
-      flex-wrap: wrap;
-    }
-    .meta-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: rgba(240,237,232,0.4); }
-    .meta-dot { width: 4px; height: 4px; border-radius: 50%; background: #c8a96e; flex-shrink: 0; }
-    .btn-start {
-      background: linear-gradient(135deg, #c8a96e, #a8894e);
-      border: none;
-      border-radius: 14px;
-      padding: 1.1rem 3rem;
-      color: #0a0a0f;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .btn-start:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(200,169,110,0.35); }
+    .btn-restart { background: none; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.7rem 1.25rem; color: rgba(240,237,232,0.4); font-family: 'DM Sans', sans-serif; font-size: 0.82rem; cursor: pointer; margin-top: 1rem; width: 100%; transition: all 0.2s; }
+    .btn-restart:hover { border-color: rgba(255,255,255,0.15); color: #f0ede8; }
+
+    .disclaimer { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.05); color: rgba(240,237,232,0.25); font-size: 0.7rem; line-height: 1.6; text-align: center; }
   </style>
 </head>
 <body>
+  <nav>
+    <a href="/" class="nav-logo">investicni<span>test</span>.cz</a>
+    <div class="nav-links">
+      <a href="/kviz" class="nav-link active">Kvíz</a>
+      <a href="/kalkulacka" class="nav-link">Kalkulačka</a>
+      <a href="/vynos" class="nav-link">Výnos</a>
+    </div>
+  </nav>
   <div id="root"></div>
   <script type="text/babel">
     const { useState } = React;
 
     const questions = [
-      {
-        id: "age",
-        label: "Životní situace",
-        question: "Jak bys popsal svou aktuální situaci?",
-        options: [
-          { value: "student", label: "Student", icon: "🎓" },
-          { value: "young_worker", label: "Začínám kariéru (20–30 let)", icon: "🚀" },
-          { value: "established", label: "Stabilní příjem, rodina (30–50 let)", icon: "🏡" },
-          { value: "senior", label: "Blíží se důchod (50+)", icon: "🌅" },
-        ],
-      },
-      {
-        id: "amount",
-        label: "Měsíční investice",
-        question: "Kolik bys mohl měsíčně investovat?",
-        options: [
-          { value: "low", label: "Do 500 Kč", icon: "💧" },
-          { value: "medium", label: "500 – 2 000 Kč", icon: "💰" },
-          { value: "high", label: "2 000 – 10 000 Kč", icon: "📈" },
-          { value: "very_high", label: "Více než 10 000 Kč", icon: "🏦" },
-        ],
-      },
-      {
-        id: "risk",
-        label: "Vztah k riziku",
-        question: "Jak reaguješ, když tvoje investice dočasně klesne o 20 %?",
-        options: [
-          { value: "very_low", label: "Prodám vše, nechci riskovat ztrátu", icon: "🛡️" },
-          { value: "low", label: "Budu nervózní, ale počkám", icon: "😟" },
-          { value: "medium", label: "Klid, vím že to je normální", icon: "😌" },
-          { value: "high", label: "Dokoupím, je to příležitost", icon: "😎" },
-        ],
-      },
-      {
-        id: "horizon",
-        label: "Investiční horizont",
-        question: "Za jak dlouho budeš peníze potřebovat?",
-        options: [
-          { value: "short", label: "Do 2 let", icon: "⚡" },
-          { value: "medium", label: "2 – 5 let", icon: "📅" },
-          { value: "long", label: "5 – 15 let", icon: "🌱" },
-          { value: "very_long", label: "15+ let (důchod)", icon: "🔭" },
-        ],
-      },
-      {
-        id: "experience",
-        label: "Zkušenosti",
-        question: "Jaké máš dosavadní zkušenosti s investováním?",
-        options: [
-          { value: "none", label: "Žádné, začínám od nuly", icon: "🌱" },
-          { value: "basic", label: "Spořicí účet, termínovaný vklad", icon: "🏦" },
-          { value: "some", label: "ETF nebo podílové fondy", icon: "📊" },
-          { value: "experienced", label: "Akcie, krypto, deriváty", icon: "⚡" },
-        ],
-      },
+      { id: "age", label: "Životní situace", question: "Jak bys popsal svou aktuální situaci?", options: [
+        { value: "student", label: "Student", icon: "🎓" },
+        { value: "young_worker", label: "Začínám kariéru (20–30 let)", icon: "🚀" },
+        { value: "established", label: "Stabilní příjem, rodina (30–50 let)", icon: "🏡" },
+        { value: "senior", label: "Blíží se důchod (50+)", icon: "🌅" },
+      ]},
+      { id: "amount", label: "Měsíční investice", question: "Kolik bys mohl měsíčně investovat?", options: [
+        { value: "low", label: "Do 500 Kč", icon: "💧" },
+        { value: "medium", label: "500 – 2 000 Kč", icon: "💰" },
+        { value: "high", label: "2 000 – 10 000 Kč", icon: "📈" },
+        { value: "very_high", label: "Více než 10 000 Kč", icon: "🏦" },
+      ]},
+      { id: "risk", label: "Vztah k riziku", question: "Jak reaguješ, když tvoje investice dočasně klesne o 20 %?", options: [
+        { value: "very_low", label: "Prodám vše, nechci riskovat ztrátu", icon: "🛡️" },
+        { value: "low", label: "Budu nervózní, ale počkám", icon: "😟" },
+        { value: "medium", label: "Klid, vím že to je normální", icon: "😌" },
+        { value: "high", label: "Dokoupím, je to příležitost", icon: "😎" },
+      ]},
+      { id: "horizon", label: "Investiční horizont", question: "Za jak dlouho budeš peníze potřebovat?", options: [
+        { value: "short", label: "Do 2 let", icon: "⚡" },
+        { value: "medium", label: "2 – 5 let", icon: "📅" },
+        { value: "long", label: "5 – 15 let", icon: "🌱" },
+        { value: "very_long", label: "15+ let (důchod)", icon: "🔭" },
+      ]},
+      { id: "experience", label: "Zkušenosti", question: "Jaké máš dosavadní zkušenosti s investováním?", options: [
+        { value: "none", label: "Žádné, začínám od nuly", icon: "🌱" },
+        { value: "basic", label: "Spořicí účet, termínovaný vklad", icon: "🏦" },
+        { value: "some", label: "ETF nebo podílové fondy", icon: "📊" },
+        { value: "experienced", label: "Akcie, krypto, deriváty", icon: "⚡" },
+      ]},
     ];
 
     function getProfile(answers) {
@@ -339,31 +176,24 @@
       const isStudent = age === "student";
       const isLowAmount = amount === "low";
       const isShortHorizon = horizon === "short" || horizon === "medium";
-
-      if (isBeginnerRisk || isInexperienced || isStudent || isLowAmount) {
-        return {
-          type: "Konzervativní začátečník",
-          description: "Preferuješ jistotu a nechceš riskovat. Ideální pro tebe jsou jednoduché, diverzifikované produkty s minimálním vstupem a automatickým řízením.",
-          platforms: [
-            { name: "Portu", desc: "Česká roboadvisory platforma. Začneš od 100 Kč, vše řídí algoritmus za tebe. Ideální pro úplné začátečníky.", tag: "Nejlepší volba", primary: true, url: "https://www.portu.cz" },
-            { name: "Fondee", desc: "Podobný koncept jako Portu, ETF portfolia sestavená profesionály. Nižší poplatky, o něco více možností.", tag: "Alternativa", primary: false, url: "https://www.fondee.cz" },
-            { name: "XTB", desc: "Pokud chceš časem přejít na samostatné investování, XTB nabízí ETF bez poplatků a skvělou edukaci.", tag: "Do budoucna", primary: false, url: "https://www.xtb.com/cz" },
-          ],
-        };
-      }
-
-      if (!isBeginnerRisk && !isShortHorizon && experience === "some") {
-        return {
-          type: "Středně pokročilý investor",
-          description: "Máš základy a jsi ochotný nést určité riziko za vyšší výnos. Vhodná kombinace je vlastní ETF portfolio s možností přidat jednotlivé akcie.",
-          platforms: [
-            { name: "XTB", desc: "ETF zdarma, intuitivní aplikace, výukové materiály. Nejlepší kombinace ceny a funkčnosti pro samostatné investory.", tag: "Nejlepší volba", primary: true, url: "https://www.xtb.com/cz" },
-            { name: "Trading 212", desc: "Frakční akcie, automatické investování, žádné poplatky. Oblíbený mezi mladšími investory.", tag: "Alternativa", primary: false, url: "https://www.trading212.com" },
-            { name: "Fondee", desc: "Pro část portfolia kde chceš pasivní přístup bez starostí o rebalancing.", tag: "Doplněk", primary: false, url: "https://www.fondee.cz" },
-          ],
-        };
-      }
-
+      if (isBeginnerRisk || isInexperienced || isStudent || isLowAmount) return {
+        type: "Konzervativní začátečník",
+        description: "Preferuješ jistotu a nechceš riskovat. Ideální pro tebe jsou jednoduché, diverzifikované produkty s minimálním vstupem a automatickým řízením.",
+        platforms: [
+          { name: "Portu", desc: "Česká roboadvisory platforma. Začneš od 100 Kč, vše řídí algoritmus za tebe. Ideální pro úplné začátečníky.", tag: "Nejlepší volba", primary: true, url: "https://www.portu.cz" },
+          { name: "Fondee", desc: "Podobný koncept jako Portu, ETF portfolia sestavená profesionály. Nižší poplatky, více možností.", tag: "Alternativa", primary: false, url: "https://www.fondee.cz" },
+          { name: "XTB", desc: "Pokud chceš časem přejít na samostatné investování, XTB nabízí ETF bez poplatků a skvělou edukaci.", tag: "Do budoucna", primary: false, url: "https://www.xtb.com/cz" },
+        ],
+      };
+      if (!isBeginnerRisk && !isShortHorizon && experience === "some") return {
+        type: "Středně pokročilý investor",
+        description: "Máš základy a jsi ochotný nést určité riziko za vyšší výnos. Vhodná kombinace je vlastní ETF portfolio s možností přidat jednotlivé akcie.",
+        platforms: [
+          { name: "XTB", desc: "ETF zdarma, intuitivní aplikace, výukové materiály. Nejlepší kombinace ceny a funkčnosti pro samostatné investory.", tag: "Nejlepší volba", primary: true, url: "https://www.xtb.com/cz" },
+          { name: "Trading 212", desc: "Frakční akcie, automatické investování, žádné poplatky. Oblíbený mezi mladšími investory.", tag: "Alternativa", primary: false, url: "https://www.trading212.com" },
+          { name: "Fondee", desc: "Pro část portfolia kde chceš pasivní přístup bez starostí o rebalancing.", tag: "Doplněk", primary: false, url: "https://www.fondee.cz" },
+        ],
+      };
       return {
         type: "Zkušený investor",
         description: "Znáš trhy, vydržíš volatilitu a hledáš maximální kontrolu nad svým portfoliem. Kombinace brokerů ti dá největší flexibilitu.",
@@ -379,7 +209,6 @@
       const [step, setStep] = useState(-1);
       const [answers, setAnswers] = useState({});
       const [selected, setSelected] = useState(null);
-
       const currentQ = questions[step];
       const isIntro = step === -1;
       const isDone = step >= questions.length;
@@ -392,30 +221,17 @@
         setSelected(null);
         setStep(s => s + 1);
       }
-
       function handleBack() {
         if (step <= 0) { setStep(-1); setSelected(null); return; }
-        setStep(s => s - 1);
-        setSelected(null);
+        setStep(s => s - 1); setSelected(null);
       }
-
-      function handleRestart() {
-        setStep(-1);
-        setAnswers({});
-        setSelected(null);
-      }
+      function handleRestart() { setStep(-1); setAnswers({}); setSelected(null); }
 
       return (
         <div className="quiz-root">
-          <div className="bg-orb bg-orb-1" />
-          <div className="bg-orb bg-orb-2" />
-          <div className="bg-orb bg-orb-3" />
+          <div className="bg-orb bg-orb-1" /><div className="bg-orb bg-orb-2" />
           <div className="quiz-card">
-            {!isIntro && (
-              <div className="progress-bar-wrap">
-                <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
-              </div>
-            )}
+            {!isIntro && <div className="progress-bar-wrap"><div className="progress-bar-fill" style={{width:`${progress}%`}} /></div>}
 
             {isIntro && (
               <div className="intro-section">
@@ -437,13 +253,8 @@
                 <h2 className="question-title">{currentQ.question}</h2>
                 <div className="options-grid">
                   {currentQ.options.map(opt => (
-                    <button
-                      key={opt.value}
-                      className={`option-btn${selected === opt.value ? " selected" : ""}`}
-                      onClick={() => setSelected(opt.value)}
-                    >
-                      <span className="option-icon">{opt.icon}</span>
-                      {opt.label}
+                    <button key={opt.value} className={`option-btn${selected === opt.value ? " selected" : ""}`} onClick={() => setSelected(opt.value)}>
+                      <span className="option-icon">{opt.icon}</span>{opt.label}
                     </button>
                   ))}
                 </div>
@@ -473,15 +284,33 @@
                     <span className={`platform-tag ${p.primary ? "tag-top" : "tag-alt"}`}>{p.tag}</span>
                   </a>
                 ))}
+                <div className="tools-cta">
+                  <div className="tools-cta-label">Další nástroje</div>
+                  <div className="tools-cta-grid">
+                    <a href="/kalkulacka" className="tool-cta-card">
+                      <span className="tool-cta-icon">📈</span>
+                      <div className="tool-cta-text">
+                        <div className="tool-cta-name">Kalkulačka</div>
+                        Jak moc vydělá složené úročení?
+                      </div>
+                    </a>
+                    <a href="/vynos" className="tool-cta-card">
+                      <span className="tool-cta-icon">⚖️</span>
+                      <div className="tool-cta-text">
+                        <div className="tool-cta-name">Výnos vs riziko</div>
+                        Kolik % reálně čekat?
+                      </div>
+                    </a>
+                  </div>
+                </div>
                 <button className="btn-restart" onClick={handleRestart}>↺ Spustit kvíz znovu</button>
-                <div className="disclaimer">Obsah tohoto webu má pouze informační a edukační charakter. Neposkytujeme investiční poradenství ve smyslu zákona č. 256/2004 Sb. o podnikání na kapitálovém trhu. Výsledky kvízu jsou orientační a nezohledňují vaši úplnou finanční situaci. Před jakýmkoliv investičním rozhodnutím doporučujeme konzultaci s licencovaným odborníkem. Investování je spojeno s rizikem ztráty vložených prostředků.</div>
+                <div className="disclaimer">Obsah tohoto webu má pouze informační a edukační charakter. Neposkytujeme investiční poradenství ve smyslu zákona č. 256/2004 Sb. Před jakýmkoliv investičním rozhodnutím doporučujeme konzultaci s licencovaným odborníkem. Investování je spojeno s rizikem ztráty vložených prostředků.</div>
               </>
             )}
           </div>
         </div>
       );
     }
-
     ReactDOM.render(<App />, document.getElementById('root'));
   </script>
 </body>
