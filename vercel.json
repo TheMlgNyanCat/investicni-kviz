@@ -1,7 +1,6 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/landing.html" },
-    { "source": "/kviz", "destination": "/index.html" },
+    { "source": "/kviz", "destination": "/kviz.html" },
     { "source": "/kalkulacka", "destination": "/kalkulacka.html" },
     { "source": "/vynos", "destination": "/vynos.html" }
   ]
