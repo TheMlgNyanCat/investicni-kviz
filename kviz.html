@@ -205,44 +205,93 @@
 
     function getProfile(answers) {
       const { age, savings, goal, amount, risk, horizon, experience } = answers;
-      const isBeginnerRisk = risk === "very_low" || risk === "low";
-      const isInexperienced = experience === "none" || experience === "basic";
-      const isStudent = age === "student";
-      const isLowAmount = amount === "low";
-      const isShortHorizon = horizon === "short" || horizon === "medium";
-      const noSavings = savings === "none" || savings === "partial";
-      const wantsProtection = goal === "protect" || goal === "big_purchase";
 
-      if (isBeginnerRisk || isInexperienced || isStudent || isLowAmount || noSavings || wantsProtection) return {
-        type: "Konzervativní začátečník",
-        description: "Preferuješ jistotu a chceš se vyhnout zbytečnému riziku. Ideální pro tebe jsou jednoduché, automatizované produkty kde nemusíš nic sledovat — stačí nastavit a nechat pracovat.",
-        reason: "Proč právě tyhle platformy? Protože nevyžadují žádné znalosti, mají nízký vstupní kapitál a vše řeší za tebe. Žádné složité rozhodování.",
+      // Bodový systém — čím více bodů, tím agresivnější profil
+      let score = 0;
+
+      // Zkušenosti (0–3)
+      if (experience === "none") score += 0;
+      else if (experience === "basic") score += 1;
+      else if (experience === "some") score += 2;
+      else if (experience === "experienced") score += 3;
+
+      // Riziko (0–3)
+      if (risk === "very_low") score += 0;
+      else if (risk === "low") score += 1;
+      else if (risk === "medium") score += 2;
+      else if (risk === "high") score += 3;
+
+      // Horizont (0–3)
+      if (horizon === "short") score += 0;
+      else if (horizon === "medium") score += 1;
+      else if (horizon === "long") score += 2;
+      else if (horizon === "very_long") score += 3;
+
+      // Částka (0–2)
+      if (amount === "low") score += 0;
+      else if (amount === "medium") score += 1;
+      else if (amount === "high" || amount === "very_high") score += 2;
+
+      // Rezerva (0–2)
+      if (savings === "none") score += 0;
+      else if (savings === "partial") score += 1;
+      else if (savings === "yes" || savings === "large") score += 2;
+
+      // Cíl (0–1)
+      if (goal === "protect" || goal === "big_purchase") score += 0;
+      else if (goal === "grow" || goal === "retire") score += 1;
+
+      // Věk/situace — senior dostane penalizaci
+      if (age === "senior") score -= 2;
+
+      // 4 profily podle skóre (max 14 bodů)
+      // 0–4: Konzervativní, 5–7: Vyvážený, 8–10: Dynamický, 11+: Agresivní
+
+      if (score <= 4) return {
+        type: "Konzervativní investor",
+        scoreDesc: `Skóre rizika: ${score}/14`,
+        description: "Preferuješ jistotu a stabilitu. Ideální jsou jednoduché automatizované produkty kde stačí nastavit a zapomenout — bez nutnosti sledovat trhy.",
+        reason: "Tyto platformy zvládneš bez jakýchkoliv předchozích znalostí. Nízký vstupní kapitál, vše řídí algoritmus za tebe.",
         platforms: [
-          { name: "Portu", desc: "Česká roboadvisory platforma. Začneš od 100 Kč, portfolio sestaví a řídí algoritmus. Nejjednodušší start bez nutnosti cokoliv znát.", tag: "Nejlepší volba", primary: true, url: "https://www.portu.cz" },
-          { name: "Fondee", desc: "ETF portfolia sestavená profesionály. Nižší poplatky než Portu, o něco více možností při výběru portfolia.", tag: "Alternativa", primary: false, url: "https://www.fondee.cz" },
-          { name: "XTB", desc: "Až budeš připravený investovat samostatně — ETF zdarma, skvělá edukace a žádné poplatky za vedení účtu.", tag: "Do budoucna", primary: false, url: "https://www.xtb.com/cz" },
+          { name: "Portu", desc: "Česká roboadvisory platforma. Začneš od 100 Kč, portfolio sestaví a řídí algoritmus automaticky.", tag: "Nejlepší volba", primary: true, url: "https://www.portu.cz" },
+          { name: "Fondee", desc: "ETF portfolia sestavená profesionály. Nižší poplatky než Portu, jednoduchý výběr konzervativního portfolia.", tag: "Alternativa", primary: false, url: "https://www.fondee.cz" },
+          { name: "Spořicí účet — Fio", desc: "Pokud ještě nemáš finanční rezervu — nejdřív našetři 3–6 měsíců výdajů, pak začni investovat.", tag: "Základ", primary: false, url: "https://www.fio.cz" },
         ],
       };
 
-      if (!isBeginnerRisk && !isShortHorizon && (experience === "some" || experience === "experienced")) return {
-        type: "Zkušený investor",
-        description: "Znáš základy, vydržíš volatilitu a chceš mít kontrolu nad svým portfoliem. Nejlepší přístup je kombinace ETF pro základ a jednotlivé akcie pro aktivnější část portfolia.",
-        reason: "Proč právě tyhle platformy? Protože nabízejí nejlepší kombinaci nízkých poplatků, širokého výběru a pokročilých nástrojů pro samostatné investování.",
+      if (score <= 7) return {
+        type: "Vyvážený investor",
+        scoreDesc: `Skóre rizika: ${score}/14`,
+        description: "Hledáš rovnováhu mezi výnosem a rizikem. Chceš aby peníze rostly, ale bez zbytečných výkyvů. Kombinace ETF fondů je pro tebe ideální základ.",
+        reason: "Tyto platformy ti dají přístup k globálním ETF s minimálními poplatky — ideální pro pravidelné investování bez nutnosti aktivního řízení.",
         platforms: [
-          { name: "XTB", desc: "ETF zdarma, pokročilé grafy, přes 6000 instrumentů. Česká podpora, regulace ČNB. Nejlepší volba pro samostatné investory.", tag: "Nejlepší volba", primary: true, url: "https://www.xtb.com/cz" },
-          { name: "Trading 212", desc: "Frakční akcie od 1 Kč, automatické investiční plány, žádné poplatky. Skvělý jako druhý broker pro diverzifikaci.", tag: "Alternativa", primary: false, url: "https://www.trading212.com" },
-          { name: "Fondee", desc: "Pro pasivní část portfolia — ETF portfolia na autopilotu bez nutnosti rebalancingu.", tag: "Doplněk", primary: false, url: "https://www.fondee.cz" },
+          { name: "XTB", desc: "ETF zdarma, intuitivní aplikace, výukové materiály v češtině. Nejlepší start pro samostatné ETF investování.", tag: "Nejlepší volba", primary: true, url: "https://www.xtb.com/cz" },
+          { name: "Fondee", desc: "Automaticky sestavená ETF portfolia — méně kontroly, ale nulová starost o rebalancing.", tag: "Jednodušší varianta", primary: false, url: "https://www.fondee.cz" },
+          { name: "Trading 212", desc: "Automatické investiční plány, frakční akcie od 1 Kč. Oblíbený mezi mladšími investory.", tag: "Alternativa", primary: false, url: "https://www.trading212.com" },
+        ],
+      };
+
+      if (score <= 10) return {
+        type: "Dynamický investor",
+        scoreDesc: `Skóre rizika: ${score}/14`,
+        description: "Jsi ochotný přijmout vyšší riziko za nadprůměrný výnos. Kombinace globálních ETF jako základ a výběr jednotlivých akcií jako aktivnější část portfolia.",
+        reason: "Potřebuješ platformy s nízkými poplatky, širokým výběrem instrumentů a dobrými analytickými nástroji. Tyto tři to splňují nejlépe.",
+        platforms: [
+          { name: "XTB", desc: "Přes 6000 instrumentů, ETF zdarma, pokročilé grafy. Česká podpora a regulace ČNB — nejlepší pro aktivní investory.", tag: "Nejlepší volba", primary: true, url: "https://www.xtb.com/cz" },
+          { name: "Trading 212", desc: "Frakční akcie od 1 Kč, žádné poplatky, automatické plány. Skvělý jako druhý broker.", tag: "Alternativa", primary: false, url: "https://www.trading212.com" },
+          { name: "Portu", desc: "Pro pasivní část portfolia na autopilotu — i dynamičtí investoři ocení mít část peněz bez starostí.", tag: "Doplněk", primary: false, url: "https://www.portu.cz" },
         ],
       };
 
       return {
-        type: "Středně pokročilý investor",
-        description: "Máš základy a jsi ochotný přijmout určité riziko za vyšší výnos. Ideální kombinace je automatizované ETF portfolio jako základ, s možností přidat vlastní výběr akcií.",
-        reason: "Proč právě tyhle platformy? Nabízejí nejlepší poměr jednoduchosti a flexibility — ideální pokud chceš víc kontroly, ale nechceš trávit hodiny sledováním trhů.",
+        type: "Agresivní investor",
+        scoreDesc: `Skóre rizika: ${score}/14`,
+        description: "Hledáš maximální výnos a jsi připravený na vysokou volatilitu. Máš zkušenosti a dlouhý horizont — můžeš si dovolit agresivnější přístup.",
+        reason: "Potřebuješ přístup k co nejširšímu spektru instrumentů s minimálními poplatky. Kombinace brokera a krypto burzy dá největší flexibilitu.",
         platforms: [
-          { name: "XTB", desc: "ETF zdarma, intuitivní aplikace, výukové materiály v češtině. Nejlepší kombinace ceny a funkčnosti.", tag: "Nejlepší volba", primary: true, url: "https://www.xtb.com/cz" },
-          { name: "Trading 212", desc: "Frakční akcie, automatické investování, žádné poplatky. Oblíbený mezi mladšími investory.", tag: "Alternativa", primary: false, url: "https://www.trading212.com" },
-          { name: "Fondee", desc: "Pro část portfolia kde chceš pasivní přístup bez starostí o rebalancing.", tag: "Doplněk", primary: false, url: "https://www.fondee.cz" },
+          { name: "XTB", desc: "Nejlepší broker pro ČR — akcie, ETF, CFD, komodity. Regulace ČNB, česká podpora, žádné poplatky za ETF.", tag: "Nejlepší volba", primary: true, url: "https://www.xtb.com/cz" },
+          { name: "Trading 212", desc: "Frakční akcie, ISA účet, automatické plány. Ideální jako druhý broker pro diverzifikaci rizika brokera.", tag: "Druhý broker", primary: false, url: "https://www.trading212.com" },
+          { name: "Coinbase", desc: "Pokud chceš část portfolia v kryptu — regulovaná burza s nejlepší bezpečností pro začínající krypto investory.", tag: "Krypto", primary: false, url: "https://www.coinbase.com" },
         ],
       };
     }
