@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/kviz", "destination": "/kviz.html" },
     { "source": "/kalkulacka", "destination": "/kalkulacka.html" },
-    { "source": "/vynos", "destination": "/vynos.html" }
+    { "source": "/vynos", "destination": "/vynos.html" },
+    { "source": "/inflace", "destination": "/inflace.html" }
   ]
 }
