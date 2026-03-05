@@ -160,6 +160,192 @@
 
     const questions = [
       { id: "age", label: "Životní situace", question: "Jak bys popsal svou aktuální situaci?", options: [
+        { value: "student", label: "Student nebo čerstvý absolvent" },
+        { value: "young_worker", label: "Začínám kariéru, první příjem" },
+        { value: "established", label: "Stabilní příjem, chci budovat majetek" },
+        { value: "senior", label: "Blíží se důchod, chci ochránit úspory" },
+      ]},
+      { id: "savings", label: "Finanční rezerva", question: "Máš finanční rezervu na 3–6 měsíců výdajů?", options: [
+        { value: "none", label: "Nemám žádnou rezervu" },
+        { value: "partial", label: "Mám částečnou rezervu (1–2 měsíce)" },
+        { value: "yes", label: "Ano, mám rezervu a chci investovat zbytek" },
+        { value: "large", label: "Mám velké úspory a nevím co s nimi" },
+      ]},
+      { id: "goal", label: "Investiční cíl", question: "Co je tvůj hlavní důvod pro investování?", options: [
+        { value: "protect", label: "Ochránit úspory před inflací" },
+        { value: "grow", label: "Postupně budovat majetek" },
+        { value: "retire", label: "Zajistit se na důchod" },
+        { value: "big_purchase", label: "Spořit na konkrétní cíl (byt, auto...)" },
+      ]},
+      { id: "amount", label: "Měsíční investice", question: "Kolik bys mohl měsíčně investovat?", options: [
+        { value: "low", label: "Do 500 Kč" },
+        { value: "medium", label: "500 – 2 000 Kč" },
+        { value: "high", label: "2 000 – 10 000 Kč" },
+        { value: "very_high", label: "Více než 10 000 Kč" },
+      ]},
+      { id: "risk", label: "Vztah k riziku", question: "Jak reaguješ, když tvoje investice dočasně klesne o 20 %?", options: [
+        { value: "very_low", label: "Prodám vše — nechci riskovat ztrátu" },
+        { value: "low", label: "Budu nervózní, ale počkám" },
+        { value: "medium", label: "Klid, vím že výkyvy jsou normální" },
+        { value: "high", label: "Dokoupím — je to příležitost" },
+      ]},
+      { id: "horizon", label: "Investiční horizont", question: "Za jak dlouho budeš tyto peníze potřebovat?", options: [
+        { value: "short", label: "Do 2 let" },
+        { value: "medium", label: "2 – 5 let" },
+        { value: "long", label: "5 – 15 let" },
+        { value: "very_long", label: "15+ let" },
+      ]},
+      { id: "experience", label: "Zkušenosti", question: "Jaké máš dosavadní zkušenosti s investováním?", options: [
+        { value: "none", label: "Žádné, začínám od nuly" },
+        { value: "basic", label: "Spořicí účet nebo termínovaný vklad" },
+        { value: "some", label: "ETF nebo podílové fondy" },
+        { value: "experienced", label: "Akcie, krypto nebo deriváty" },
+      ]},
+    ];
+
+    function getProfile(answers) {
+      const { age, savings, goal, amount, risk, horizon, experience } = answers;
+      const isBeginnerRisk = risk === "very_low" || risk === "low";
+      const isInexperienced = experience === "none" || experience === "basic";
+      const isStudent = age === "student";
+      const isLowAmount = amount === "low";
+      const isShortHorizon = horizon === "short" || horizon === "medium";
+      const noSavings = savings === "none" || savings === "partial";
+      const wantsProtection = goal === "protect" || goal === "big_purchase";
+
+      if (isBeginnerRisk || isInexperienced || isStudent || isLowAmount || noSavings || wantsProtection) return {
+        type: "Konzervativní začátečník",
+        description: "Preferuješ jistotu a chceš se vyhnout zbytečnému riziku. Ideální pro tebe jsou jednoduché, automatizované produkty kde nemusíš nic sledovat — stačí nastavit a nechat pracovat.",
+        reason: "Proč právě tyhle platformy? Protože nevyžadují žádné znalosti, mají nízký vstupní kapitál a vše řeší za tebe. Žádné složité rozhodování.",
+        platforms: [
+          { name: "Portu", desc: "Česká roboadvisory platforma. Začneš od 100 Kč, portfolio sestaví a řídí algoritmus. Nejjednodušší start bez nutnosti cokoliv znát.", tag: "Nejlepší volba", primary: true, url: "https://www.portu.cz" },
+          { name: "Fondee", desc: "ETF portfolia sestavená profesionály. Nižší poplatky než Portu, o něco více možností při výběru portfolia.", tag: "Alternativa", primary: false, url: "https://www.fondee.cz" },
+          { name: "XTB", desc: "Až budeš připravený investovat samostatně — ETF zdarma, skvělá edukace a žádné poplatky za vedení účtu.", tag: "Do budoucna", primary: false, url: "https://www.xtb.com/cz" },
+        ],
+      };
+
+      if (!isBeginnerRisk && !isShortHorizon && (experience === "some" || experience === "experienced")) return {
+        type: "Zkušený investor",
+        description: "Znáš základy, vydržíš volatilitu a chceš mít kontrolu nad svým portfoliem. Nejlepší přístup je kombinace ETF pro základ a jednotlivé akcie pro aktivnější část portfolia.",
+        reason: "Proč právě tyhle platformy? Protože nabízejí nejlepší kombinaci nízkých poplatků, širokého výběru a pokročilých nástrojů pro samostatné investování.",
+        platforms: [
+          { name: "XTB", desc: "ETF zdarma, pokročilé grafy, přes 6000 instrumentů. Česká podpora, regulace ČNB. Nejlepší volba pro samostatné investory.", tag: "Nejlepší volba", primary: true, url: "https://www.xtb.com/cz" },
+          { name: "Trading 212", desc: "Frakční akcie od 1 Kč, automatické investiční plány, žádné poplatky. Skvělý jako druhý broker pro diverzifikaci.", tag: "Alternativa", primary: false, url: "https://www.trading212.com" },
+          { name: "Fondee", desc: "Pro pasivní část portfolia — ETF portfolia na autopilotu bez nutnosti rebalancingu.", tag: "Doplněk", primary: false, url: "https://www.fondee.cz" },
+        ],
+      };
+
+      return {
+        type: "Středně pokročilý investor",
+        description: "Máš základy a jsi ochotný přijmout určité riziko za vyšší výnos. Ideální kombinace je automatizované ETF portfolio jako základ, s možností přidat vlastní výběr akcií.",
+        reason: "Proč právě tyhle platformy? Nabízejí nejlepší poměr jednoduchosti a flexibility — ideální pokud chceš víc kontroly, ale nechceš trávit hodiny sledováním trhů.",
+        platforms: [
+          { name: "XTB", desc: "ETF zdarma, intuitivní aplikace, výukové materiály v češtině. Nejlepší kombinace ceny a funkčnosti.", tag: "Nejlepší volba", primary: true, url: "https://www.xtb.com/cz" },
+          { name: "Trading 212", desc: "Frakční akcie, automatické investování, žádné poplatky. Oblíbený mezi mladšími investory.", tag: "Alternativa", primary: false, url: "https://www.trading212.com" },
+          { name: "Fondee", desc: "Pro část portfolia kde chceš pasivní přístup bez starostí o rebalancing.", tag: "Doplněk", primary: false, url: "https://www.fondee.cz" },
+        ],
+      };
+    }
+
+    function App() {
+      const [step, setStep] = useState(-1);
+      const [answers, setAnswers] = useState({});
+      const [selected, setSelected] = useState(null);
+      const currentQ = questions[step];
+      const isIntro = step === -1;
+      const isDone = step >= questions.length;
+      const progress = isDone ? 100 : isIntro ? 0 : (step / questions.length) * 100;
+      const profile = isDone ? getProfile(answers) : null;
+
+      function handleNext() {
+        if (selected === null) return;
+        setAnswers(prev => ({ ...prev, [currentQ.id]: selected }));
+        setSelected(null);
+        setStep(s => s + 1);
+      }
+      function handleBack() {
+        if (step <= 0) { setStep(-1); setSelected(null); return; }
+        setStep(s => s - 1); setSelected(null);
+      }
+      function handleRestart() { setStep(-1); setAnswers({}); setSelected(null); }
+
+      return (
+        <div className="quiz-root">
+          <div className="bg-orb bg-orb-1" /><div className="bg-orb bg-orb-2" />
+          <div className="quiz-card">
+            {!isIntro && <div className="progress-bar-wrap"><div className="progress-bar-fill" style={{width:`${progress}%`}} /></div>}
+
+            {isIntro && (
+              <div className="intro-section">
+                <div className="intro-icon">📊</div>
+                <h1 className="intro-title">Kde začít<br /><span>investovat?</span></h1>
+                <p className="intro-desc">7 otázek. Dostaneš konkrétní doporučení platforem přizpůsobené přesně tvé situaci — bez obecných rad.</p>
+                <div className="intro-meta">
+                  <div className="meta-item"><div className="meta-dot" />7 otázek</div>
+                  <div className="meta-item"><div className="meta-dot" />~3 minuty</div>
+                  <div className="meta-item"><div className="meta-dot" />Zdarma</div>
+                </div>
+                <button className="btn-start" onClick={() => setStep(0)}>Začít kvíz →</button>
+              </div>
+            )}
+
+            {!isIntro && !isDone && (
+              <>
+                <div className="step-label">{step + 1} / {questions.length} — {currentQ.label}</div>
+                <h2 className="question-title">{currentQ.question}</h2>
+                <div className="options-grid">
+                  {currentQ.options.map(opt => (
+                    <button key={opt.value} className={`option-btn${selected === opt.value ? " selected" : ""}`} onClick={() => setSelected(opt.value)}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="nav-row">
+                  <button className="btn-back" onClick={handleBack}>← Zpět</button>
+                  <button className="btn-next" onClick={handleNext} disabled={selected === null}>
+                    {step === questions.length - 1 ? "Zobrazit výsledky" : "Další →"}
+                  </button>
+                </div>
+              </>
+            )}
+
+            {isDone && profile && (
+              <>
+                <div className="results-header">
+                  <div className="results-badge">Tvůj profil</div>
+                  <h2 className="results-title">{profile.type}</h2>
+                  <p className="results-subtitle">{profile.description}</p>
+                </div>
+
+                <div className="platforms-title">Doporučené platformy</div>
+                {profile.platforms.map(p => (
+                  <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer" className={`platform-card${p.primary ? " primary" : ""}`}>
+                    <div className="platform-info">
+                      <div className="platform-name">{p.name}</div>
+                      <div className="platform-desc">{p.desc}</div>
+                    </div>
+                    <span className={`platform-tag ${p.primary ? "tag-top" : "tag-alt"}`}>{p.tag}</span>
+                  </a>
+                ))}
+
+                <div style={{marginTop:'1.25rem', background:'rgba(200,169,110,0.06)', border:'1px solid rgba(200,169,110,0.15)', borderRadius:'12px', padding:'1rem 1.25rem'}}>
+                  <div style={{fontSize:'0.68rem', letterSpacing:'0.1em', textTransform:'uppercase', color:'rgba(240,237,232,0.35)', marginBottom:'0.5rem'}}>Proč tyto platformy?</div>
+                  <div style={{fontSize:'0.83rem', color:'rgba(240,237,232,0.6)', lineHeight:'1.6'}}>{profile.reason}</div>
+                </div>
+
+                <button className="btn-restart" onClick={handleRestart}>↺ Spustit kvíz znovu</button>
+                <div className="disclaimer">Obsah tohoto webu má pouze informační a edukační charakter. Neposkytujeme investiční poradenství ve smyslu zákona č. 256/2004 Sb. o podnikání na kapitálovém trhu. Výsledky kvízu jsou orientační a nezohledňují vaši úplnou finanční situaci. Před jakýmkoliv investičním rozhodnutím doporučujeme konzultaci s licencovaným odborníkem. Investování je spojeno s rizikem ztráty vložených prostředků.</div>
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+
+    const questions = [
+      { id: "age", label: "Životní situace", question: "Jak bys popsal svou aktuální situaci?", options: [
         { value: "student", label: "Student", icon: "🎓" },
         { value: "young_worker", label: "Začínám kariéru (20–30 let)", icon: "🚀" },
         { value: "established", label: "Stabilní příjem, rodina (30–50 let)", icon: "🏡" },
