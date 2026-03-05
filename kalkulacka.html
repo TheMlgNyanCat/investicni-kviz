@@ -112,6 +112,7 @@
       <a href="/kviz" class="nav-link">Kvíz</a>
       <a href="/kalkulacka" class="nav-link active">Kalkulačka</a>
       <a href="/vynos" class="nav-link">Výnos</a>
+      <a href="/inflace" class="nav-link">Inflace</a>
     </div>
   </nav>
   <div id="root"></div>
@@ -132,11 +133,19 @@
       return { total, invested, profit: total - invested };
     }
 
+    function realValue(nominal, years, inflation) {
+      return nominal / Math.pow(1 + inflation / 100, years);
+    }
+
     function App() {
       const [monthly, setMonthly] = useState(2000);
       const [years, setYears] = useState(20);
       const [rate, setRate] = useState(7);
+      const [inflation, setInflation] = useState(3.5);
       const result = useMemo(() => calculate(monthly, years, rate), [monthly, years, rate]);
+      const realTotal = useMemo(() => realValue(result.total, years, inflation), [result.total, years, inflation]);
+      const inflationLoss = result.total - realTotal;
+      const realProfit = realTotal - result.invested;
 
       const chartPoints = useMemo(() => {
         const points = [];
@@ -176,6 +185,13 @@
                 <div className="slider-row">
                   <input className="slider" type="range" min={1} max={15} step={0.5} value={rate} onChange={e => setRate(Number(e.target.value))} style={{background:`linear-gradient(to right,#c8a96e ${(rate-1)/14*100}%,rgba(255,255,255,0.1) ${(rate-1)/14*100}%)`}} />
                   <span className="slider-value">{rate} %</span>
+                </div>
+              </div>
+              <div className="input-group">
+                <div className="input-label">Průměrná roční inflace — {inflation} %</div>
+                <div className="slider-row">
+                  <input className="slider" type="range" min={0.5} max={10} step={0.5} value={inflation} onChange={e => setInflation(Number(e.target.value))} style={{background:`linear-gradient(to right,#e07a78 ${(inflation-0.5)/9.5*100}%,rgba(255,255,255,0.1) ${(inflation-0.5)/9.5*100}%)`}} />
+                  <span className="slider-value" style={{color:'#e07a78'}}>{inflation} %</span>
                 </div>
               </div>
             </div>
@@ -219,6 +235,29 @@
               </div>
             </div>
 
+            <div style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:'16px',padding:'1.25rem',marginBottom:'1.75rem'}}>
+              <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(240,237,232,0.35)',marginBottom:'0.875rem'}}>Nominálně vs. reálně po inflaci</div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem',marginBottom:'0.875rem'}}>
+                <div>
+                  <div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Nominální hodnota</div>
+                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:900,color:'#c8a96e'}}>{formatCZK(result.total)}</div>
+                </div>
+                <div>
+                  <div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Reálná hodnota (po inflaci)</div>
+                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:900,color: realProfit > 0 ? '#4a7c59' : '#e07a78'}}>{formatCZK(realTotal)}</div>
+                </div>
+              </div>
+              <div style={{height:'1px',background:'rgba(255,255,255,0.05)',margin:'0.875rem 0'}} />
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div style={{fontSize:'0.82rem',color:'rgba(240,237,232,0.5)'}}>
+                  {realProfit > 0
+                    ? `✓ Reálný zisk po inflaci: ${formatCZK(realProfit)}`
+                    : `⚠ Inflace spolkne ${formatCZK(Math.abs(inflationLoss))} tvého výnosu`}
+                </div>
+                <a href="/inflace" style={{fontSize:'0.75rem',color:'#e07a78',textDecoration:'none',whiteSpace:'nowrap',marginLeft:'0.75rem'}}>Inflační kalkulačka →</a>
+              </div>
+            </div>
+
             <div className="tools-cta">
               <div className="tools-cta-label">Další nástroje</div>
               <div className="tools-cta-grid">
@@ -229,6 +268,10 @@
                 <a href="/vynos" className="tool-cta-card">
                   <span className="tool-cta-icon">⚖️</span>
                   <div><div className="tool-cta-name">Výnos vs riziko</div><div className="tool-cta-text">Kolik % reálně čekat?</div></div>
+                </a>
+                <a href="/inflace" className="tool-cta-card">
+                  <span className="tool-cta-icon">🔥</span>
+                  <div><div className="tool-cta-name">Inflační kalkulačka</div><div className="tool-cta-text">Co inflace ukradne?</div></div>
                 </a>
               </div>
             </div>

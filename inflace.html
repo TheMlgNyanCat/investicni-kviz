@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inflační kalkulačka — co udělá inflace s tvými penězi? | investicnitest.cz</title>
+  <meta name="description" content="Zjisti kolik bude mít za 10, 20 nebo 30 let hodnotu dnešních 100 000 Kč. Inflace tiše požírá tvé úspory — spočítej kolik přesně." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.investicnitest.cz/inflace" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.investicnitest.cz/inflace" />
+  <meta property="og:title" content="Inflační kalkulačka — co udělá inflace s tvými penězi?" />
+  <meta property="og:description" content="Zjisti kolik bude mít za 10, 20 nebo 30 let hodnotu dnešních 100 000 Kč. Zdarma." />
+  <meta property="og:locale" content="cs_CZ" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0f; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; background: rgba(10,10,15,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: #f0ede8; text-decoration: none; }
+    .nav-logo span { color: #c8a96e; }
+    .nav-links { display: flex; gap: 0.25rem; }
+    .nav-link { padding: 0.4rem 0.75rem; border-radius: 8px; font-size: 0.8rem; font-family: 'DM Sans', sans-serif; color: rgba(240,237,232,0.5); text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+    .nav-link:hover { color: #f0ede8; background: rgba(255,255,255,0.05); }
+    .nav-link.active { color: #c8a96e; }
+
+    .root { min-height: 100vh; background: #0a0a0f; color: #f0ede8; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; padding: 6rem 1.25rem 2rem; position: relative; overflow: hidden; }
+    .bg-orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+    .bg-orb-1 { width: 600px; height: 600px; background: #c0504d; top: -200px; right: -200px; opacity: 0.1; }
+    .bg-orb-2 { width: 400px; height: 400px; background: #4a7c59; bottom: -100px; left: -100px; opacity: 0.1; }
+
+    .card { width: 100%; max-width: 640px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 2rem; backdrop-filter: blur(20px); }
+    @media (min-width: 480px) { .card { padding: 2.5rem; } }
+
+    .badge { display: inline-block; background: rgba(192,80,77,0.15); border: 1px solid rgba(192,80,77,0.3); border-radius: 100px; padding: 0.4rem 1.2rem; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #e07a78; margin-bottom: 1rem; }
+    .title { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 4vw, 2rem); font-weight: 900; color: #f0ede8; line-height: 1.2; margin-bottom: 0.75rem; }
+    .title span { color: #e07a78; }
+    .subtitle { color: rgba(240,237,232,0.5); font-size: 0.88rem; line-height: 1.6; margin-bottom: 2rem; }
+
+    .inputs { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.75rem; }
+    .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .input-label { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(240,237,232,0.4); font-weight: 500; }
+    .input-row { display: flex; align-items: center; gap: 0.75rem; }
+    .input-field { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.875rem 1.25rem; color: #f0ede8; font-family: 'DM Sans', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.2s; -moz-appearance: textfield; }
+    .input-field::-webkit-outer-spin-button, .input-field::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .input-field:focus { border-color: rgba(192,80,77,0.5); }
+    .input-unit { color: rgba(240,237,232,0.4); font-size: 0.85rem; min-width: 2rem; text-align: right; }
+
+    .slider-row { display: flex; align-items: center; gap: 1rem; }
+    .slider { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.1); outline: none; cursor: pointer; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #e07a78; cursor: pointer; box-shadow: 0 0 8px rgba(192,80,77,0.4); }
+    .slider-value { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: #e07a78; min-width: 3.5rem; text-align: right; }
+
+    /* Results */
+    .results { border-radius: 18px; padding: 1.5rem; margin-bottom: 1.75rem; background: rgba(192,80,77,0.06); border: 1px solid rgba(192,80,77,0.15); }
+
+    .results-main { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+    .result-item { }
+    .result-label { font-size: 0.7rem; color: rgba(240,237,232,0.4); letter-spacing: 0.04em; margin-bottom: 0.25rem; }
+    .result-value { font-family: 'Playfair Display', serif; font-size: clamp(1rem, 3vw, 1.3rem); font-weight: 900; line-height: 1.2; }
+    .result-value.original { color: #f0ede8; }
+    .result-value.inflated { color: #e07a78; }
+    .result-full { grid-column: span 2; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .result-value.loss { color: #e07a78; font-size: clamp(1.2rem, 4vw, 1.6rem); }
+    .result-value.green { color: #4a7c59; font-size: clamp(1.2rem, 4vw, 1.6rem); }
+
+    .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 1.25rem 0; }
+
+    /* Shock message */
+    .shock-msg { background: rgba(192,80,77,0.1); border: 1px solid rgba(192,80,77,0.2); border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; font-size: 0.85rem; color: rgba(240,237,232,0.7); line-height: 1.6; }
+    .shock-msg strong { color: #e07a78; }
+
+    /* Timeline */
+    .timeline-label { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(240,237,232,0.35); margin-bottom: 0.875rem; }
+    .timeline { display: flex; flex-direction: column; gap: 0.5rem; }
+    .timeline-row { display: flex; align-items: center; gap: 0.875rem; }
+    .timeline-year { font-size: 0.78rem; color: rgba(240,237,232,0.4); width: 3.5rem; flex-shrink: 0; }
+    .timeline-bar-wrap { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+    .timeline-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #4a7c59, #e07a78); transition: width 0.4s ease; }
+    .timeline-val { font-size: 0.78rem; font-family: 'Playfair Display', serif; font-weight: 700; color: rgba(240,237,232,0.6); width: 6rem; text-align: right; flex-shrink: 0; }
+
+    /* Spořák comparison */
+    .comparison { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 1.25rem; margin-top: 1.25rem; }
+    .comparison-title { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(240,237,232,0.35); margin-bottom: 0.875rem; }
+    .comparison-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .comparison-row:last-child { border-bottom: none; }
+    .comparison-name { font-size: 0.85rem; color: rgba(240,237,232,0.6); }
+    .comparison-val { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 700; }
+    .comparison-val.bad { color: #e07a78; }
+    .comparison-val.good { color: #4a7c59; }
+
+    .cta-section { margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); text-align: center; }
+    .cta-text { color: rgba(240,237,232,0.5); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem; }
+    .cta-btn { display: inline-block; background: linear-gradient(135deg, #c8a96e, #a8894e); border: none; border-radius: 12px; padding: 0.9rem 2rem; color: #0a0a0f; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s ease; }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,169,110,0.3); }
+
+    .tools-cta { margin-top: 1.5rem; }
+    .tools-cta-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,237,232,0.35); margin-bottom: 0.75rem; }
+    .tools-cta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+    .tool-cta-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.875rem 1rem; text-decoration: none; color: inherit; transition: all 0.2s; display: flex; align-items: center; gap: 0.6rem; }
+    .tool-cta-card:hover { border-color: rgba(200,169,110,0.25); background: rgba(200,169,110,0.05); }
+    .tool-cta-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .tool-cta-name { font-size: 0.85rem; font-weight: 500; color: #f0ede8; margin-bottom: 0.1rem; }
+    .tool-cta-text { font-size: 0.75rem; color: rgba(240,237,232,0.5); line-height: 1.3; }
+
+    .disclaimer { margin-top: 1.5rem; color: rgba(240,237,232,0.25); font-size: 0.7rem; line-height: 1.6; text-align: center; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="nav-logo">investicni<span>test</span>.cz</a>
+    <div class="nav-links">
+      <a href="/kviz" class="nav-link">Kvíz</a>
+      <a href="/kalkulacka" class="nav-link">Kalkulačka</a>
+      <a href="/vynos" class="nav-link">Výnos</a>
+      <a href="/inflace" class="nav-link active">Inflace</a>
+    </div>
+  </nav>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+
+    function formatCZK(value) {
+      if (value >= 1000000) return (value / 1000000).toFixed(2).replace('.', ',') + ' mil. Kč';
+      return Math.round(value).toLocaleString('cs-CZ') + ' Kč';
+    }
+
+    function calcInflation(amount, years, rate) {
+      return amount / Math.pow(1 + rate / 100, years);
+    }
+
+    function calcSporiak(amount, years, sporRate, inflRate) {
+      const nominal = amount * Math.pow(1 + sporRate / 100, years);
+      const real = nominal / Math.pow(1 + inflRate / 100, years);
+      return { nominal, real };
+    }
+
+    function calcETF(amount, years, etfRate, inflRate) {
+      const nominal = amount * Math.pow(1 + etfRate / 100, years);
+      const real = nominal / Math.pow(1 + inflRate / 100, years);
+      return { nominal, real };
+    }
+
+    function App() {
+      const [amount, setAmount] = useState(100000);
+      const [years, setYears] = useState(20);
+      const [inflation, setInflation] = useState(3.5);
+
+      const realValue = useMemo(() => calcInflation(amount, years, inflation), [amount, years, inflation]);
+      const loss = amount - realValue;
+      const lossPct = (loss / amount * 100).toFixed(1);
+
+      const sporiak = useMemo(() => calcSporiak(amount, years, 3.5, inflation), [amount, years, inflation]);
+      const etf = useMemo(() => calcETF(amount, years, 8, inflation), [amount, years, inflation]);
+
+      const timelineYears = [5, 10, 15, 20, 25, 30].filter(y => y <= Math.max(years, 30));
+      const maxVal = amount;
+
+      const shockMsg = useMemo(() => {
+        if (lossPct > 50) return `Více než polovina tvých peněz zmizí. Za ${years} let budeš mít reálně jen ${formatCZK(realValue)} — přitom nominálně tam pořád leží ${formatCZK(amount)}.`;
+        if (lossPct > 30) return `Téměř třetina tvých úspor se vypaří — bez jediné transakce, bez jediného výběru. Jen tím že nic neděláš.`;
+        return `Inflace je tichý zloděj. I "nízká" inflace za ${years} let spolkne ${formatCZK(loss)} z tvých úspor.`;
+      }, [lossPct, years, realValue, amount, loss]);
+
+      return (
+        <div className="root">
+          <div className="bg-orb bg-orb-1" /><div className="bg-orb bg-orb-2" />
+          <div className="card">
+            <div className="badge">Inflační kalkulačka</div>
+            <h1 className="title">Co udělá inflace<br /><span>s tvými penězi?</span></h1>
+            <p className="subtitle">Zadej částku a uvidíš kolik z ní reálně zbyde — i když se peněz ani nedotkneš.</p>
+
+            <div className="inputs">
+              <div className="input-group">
+                <div className="input-label">Částka kterou chceš chránit</div>
+                <div className="input-row">
+                  <input className="input-field" type="number" value={amount} min={1000} step={1000} onChange={e => setAmount(Math.max(0, Number(e.target.value)))} />
+                  <span className="input-unit">Kč</span>
+                </div>
+              </div>
+              <div className="input-group">
+                <div className="input-label">Časový horizont — {years} let</div>
+                <div className="slider-row">
+                  <input className="slider" type="range" min={1} max={40} value={years} onChange={e => setYears(Number(e.target.value))}
+                    style={{background:`linear-gradient(to right,#e07a78 ${(years-1)/39*100}%,rgba(255,255,255,0.1) ${(years-1)/39*100}%)`}} />
+                  <span className="slider-value">{years} let</span>
+                </div>
+              </div>
+              <div className="input-group">
+                <div className="input-label">Průměrná roční inflace — {inflation} %</div>
+                <div className="slider-row">
+                  <input className="slider" type="range" min={0.5} max={15} step={0.5} value={inflation} onChange={e => setInflation(Number(e.target.value))}
+                    style={{background:`linear-gradient(to right,#e07a78 ${(inflation-0.5)/14.5*100}%,rgba(255,255,255,0.1) ${(inflation-0.5)/14.5*100}%)`}} />
+                  <span className="slider-value">{inflation} %</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="results">
+              <div className="results-main">
+                <div className="result-item">
+                  <div className="result-label">Dnešní hodnota</div>
+                  <div className="result-value original">{formatCZK(amount)}</div>
+                </div>
+                <div className="result-item">
+                  <div className="result-label">Reálná hodnota za {years} let</div>
+                  <div className="result-value inflated">{formatCZK(realValue)}</div>
+                </div>
+                <div className="result-item result-full">
+                  <div className="result-label">Ztráta kupní síly</div>
+                  <div className={`result-value ${loss > 0 ? 'loss' : 'green'}`}>
+                    {loss > 0 ? `− ${formatCZK(loss)} (−${lossPct} %)` : `+${formatCZK(Math.abs(loss))}`}
+                  </div>
+                </div>
+              </div>
+
+              <div className="shock-msg">{shockMsg}</div>
+
+              <div className="timeline-label">Jak hodnota klesá v čase</div>
+              <div className="timeline">
+                {timelineYears.map(y => {
+                  const val = calcInflation(amount, y, inflation);
+                  const pct = (val / maxVal) * 100;
+                  return (
+                    <div key={y} className="timeline-row">
+                      <span className="timeline-year">Za {y} let</span>
+                      <div className="timeline-bar-wrap">
+                        <div className="timeline-bar" style={{width:`${pct}%`}} />
+                      </div>
+                      <span className="timeline-val">{formatCZK(val)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="comparison">
+                <div className="comparison-title">Co s penězi udělají různé přístupy za {years} let</div>
+                <div className="comparison-row">
+                  <span className="comparison-name">💸 Hotovost doma</span>
+                  <span className="comparison-val bad">{formatCZK(realValue)}</span>
+                </div>
+                <div className="comparison-row">
+                  <span className="comparison-name">🏦 Spořicí účet (3,5 % p.a.)</span>
+                  <span className={`comparison-val ${sporiak.real > amount ? 'good' : 'bad'}`}>{formatCZK(sporiak.real)}</span>
+                </div>
+                <div className="comparison-row">
+                  <span className="comparison-name">📊 ETF index (8 % p.a.)</span>
+                  <span className="comparison-val good">{formatCZK(etf.real)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="cta-section">
+              <p className="cta-text">Teď víš co inflace udělá s penězi na spořáku. Chceš zjistit jak se bránit?</p>
+              <a className="cta-btn" href="/kviz">Zjistit kde začít investovat →</a>
+            </div>
+
+            <div className="tools-cta">
+              <div className="tools-cta-label">Další nástroje</div>
+              <div className="tools-cta-grid">
+                <a href="/kalkulacka" className="tool-cta-card">
+                  <span className="tool-cta-icon">📈</span>
+                  <div><div className="tool-cta-name">Kalkulačka výnosu</div><div className="tool-cta-text">Složené úročení</div></div>
+                </a>
+                <a href="/vynos" className="tool-cta-card">
+                  <span className="tool-cta-icon">⚖️</span>
+                  <div><div className="tool-cta-name">Výnos vs riziko</div><div className="tool-cta-text">Kolik % čekat?</div></div>
+                </a>
+              </div>
+            </div>
+
+            <div className="disclaimer">Kalkulačka slouží pouze pro ilustraci dopadu inflace. Výsledky jsou orientační. Historická průměrná inflace v ČR byla cca 2–4 % p.a. Neposkytujeme investiční poradenství ve smyslu zákona č. 256/2004 Sb.</div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
