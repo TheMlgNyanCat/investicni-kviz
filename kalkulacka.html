@@ -121,29 +121,74 @@
     const { useState, useMemo } = React;
 
     function formatCZK(value) {
-      if (value >= 1000000) return (value / 1000000).toFixed(1).replace('.', ',') + ' mil. Kč';
+      if (value >= 1000000) return (value / 1000000).toFixed(2).replace('.', ',') + ' mil. Kč';
       return Math.round(value).toLocaleString('cs-CZ') + ' Kč';
     }
 
-    function calculate(monthly, years, rate) {
-      const monthlyRate = rate / 100 / 12;
-      const months = years * 12;
+    function calcGrowth(monthly, years, rate) {
+      const r = rate / 100 / 12;
+      const n = years * 12;
       let total = 0;
-      for (let i = 0; i < months; i++) total = (total + monthly) * (1 + monthlyRate);
-      const invested = monthly * months;
-      return { total, invested, profit: total - invested };
+      for (let i = 0; i < n; i++) total = (total + monthly) * (1 + r);
+      return total;
+    }
+
+    function calcMonthlyNeeded(target, years, rate) {
+      const r = rate / 100 / 12;
+      const n = years * 12;
+      if (r === 0) return target / n;
+      return target * r / (Math.pow(1 + r, n) - 1);
+    }
+
+    function calcTargetForRenta(renta, rentaYears, rate) {
+      const r = rate / 100 / 12;
+      const n = rentaYears * 12;
+      if (r === 0) return renta * n;
+      return renta * (1 - Math.pow(1 + r, -n)) / r;
     }
 
     function realValue(nominal, years, inflation) {
       return nominal / Math.pow(1 + inflation / 100, years);
     }
 
+    function SliderWithInput({ label, value, min, max, step = 1, unit, color = '#c8a96e', onChange }) {
+      const [inputVal, setInputVal] = useState(String(value));
+      const pct = (value - min) / (max - min) * 100;
+      const handleSlider = e => { const v = Number(e.target.value); onChange(v); setInputVal(String(v)); };
+      const handleInput = e => { setInputVal(e.target.value); const v = Number(e.target.value); if (!isNaN(v) && v >= min && v <= max) onChange(v); };
+      const handleBlur = () => { const v = Math.min(max, Math.max(min, Number(inputVal) || min)); onChange(v); setInputVal(String(v)); };
+      return (
+        <div className="input-group">
+          <div className="input-label">{label}</div>
+          <div className="slider-row">
+            <input className="slider" type="range" min={min} max={max} step={step} value={value} onChange={handleSlider}
+              style={{background:`linear-gradient(to right,${color} ${pct}%,rgba(255,255,255,0.1) ${pct}%)`}} />
+            <div style={{display:'flex',alignItems:'center',gap:'0.3rem',flexShrink:0}}>
+              <input type="number" value={inputVal} min={min} max={max} step={step} onChange={handleInput} onBlur={handleBlur}
+                style={{width:'3.5rem',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'8px',padding:'0.25rem 0.4rem',color,fontFamily:"'Playfair Display',serif",fontSize:'0.95rem',fontWeight:700,outline:'none',textAlign:'center',MozAppearance:'textfield'}} />
+              <span style={{fontSize:'0.8rem',color:'rgba(240,237,232,0.4)'}}>{unit}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     function App() {
+      const [mode, setMode] = useState('kolik-nasporim');
       const [monthly, setMonthly] = useState(2000);
       const [years, setYears] = useState(20);
       const [rate, setRate] = useState(7);
       const [inflation, setInflation] = useState(3.5);
-      const result = useMemo(() => calculate(monthly, years, rate), [monthly, years, rate]);
+      const [target, setTarget] = useState(1000000);
+      const [renta, setRenta] = useState(20000);
+      const [rentaYears, setRentaYears] = useState(20);
+
+      const result = useMemo(() => {
+        const total = calcGrowth(monthly, years, rate);
+        const invested = monthly * years * 12;
+        return { total, invested, profit: total - invested };
+      }, [monthly, years, rate]);
+
       const realTotal = useMemo(() => realValue(result.total, years, inflation), [result.total, years, inflation]);
       const inflationLoss = result.total - realTotal;
       const realProfit = realTotal - result.invested;
@@ -151,129 +196,174 @@
       const chartPoints = useMemo(() => {
         const points = [];
         const step = Math.max(1, Math.floor(years / 8));
-        for (let y = step; y <= years; y += step) points.push({ year: y, ...calculate(monthly, y, rate) });
+        for (let y = step; y <= years; y += step) {
+          const total = calcGrowth(monthly, y, rate);
+          points.push({ year: y, total, invested: monthly * y * 12 });
+        }
         if (points[points.length - 1]?.year !== years) points.push({ year: years, ...result });
         return points;
       }, [monthly, years, rate, result]);
 
       const maxTotal = Math.max(...chartPoints.map(p => p.total), 1);
 
+      const neededTarget = useMemo(() => {
+        if (mode === 'castka') return target;
+        return calcTargetForRenta(renta, rentaYears, rate);
+      }, [mode, target, renta, rentaYears, rate]);
+
+      const monthlyNeeded = useMemo(() => calcMonthlyNeeded(neededTarget, years, rate), [neededTarget, years, rate]);
+      const totalInvested = monthlyNeeded * years * 12;
+      const goalProfit = neededTarget - totalInvested;
+
+      const milestones = useMemo(() => {
+        const steps = [Math.round(years*0.25), Math.round(years*0.5), Math.round(years*0.75), years].filter(y => y >= 1);
+        return steps.map(y => ({ year: y, value: calcGrowth(monthlyNeeded, y, rate) }));
+      }, [monthlyNeeded, years, rate]);
+
       return (
         <div className="root">
           <div className="bg-orb bg-orb-1" /><div className="bg-orb bg-orb-2" />
           <div className="card">
-            <div className="badge">Úročení</div>
-            <h1 className="title">Jak moc vydělá<br /><span>složené úročení?</span></h1>
-            <p className="subtitle">Uprav parametry a sleduj jak roste tvůj majetek v čase.</p>
+            <div className="badge">Kalkulačka úročení</div>
+            <h1 className="title">Složené úročení<br /><span>a finanční cíle</span></h1>
+            <p className="subtitle">Kolik naspořím? Nebo kolik musím investovat abych dosáhl cíle?</p>
+
+            <div style={{display:'flex',gap:'0.4rem',marginBottom:'1.75rem',background:'rgba(255,255,255,0.04)',borderRadius:'12px',padding:'0.25rem'}}>
+              {[{id:'kolik-nasporim',label:'Kolik naspořím?'},{id:'castka',label:'Cílová částka'},{id:'renta',label:'Měsíční renta'}].map(m => (
+                <button key={m.id} onClick={() => setMode(m.id)} style={{flex:1,padding:'0.6rem 0.25rem',borderRadius:'10px',border:'none',cursor:'pointer',fontFamily:"'DM Sans',sans-serif",fontSize:'0.78rem',fontWeight:mode===m.id?500:400,background:mode===m.id?'rgba(200,169,110,0.15)':'transparent',color:mode===m.id?'#c8a96e':'rgba(240,237,232,0.4)',transition:'all 0.2s'}}>
+                  {m.label}
+                </button>
+              ))}
+            </div>
 
             <div className="inputs">
-              <div className="input-group">
-                <div className="input-label">Měsíční investice</div>
-                <div className="input-row">
-                  <input className="input-field" type="number" value={monthly} min={100} max={100000} step={100} onChange={e => setMonthly(Math.max(0, Number(e.target.value)))} />
-                  <span className="input-unit">Kč</span>
+              {mode === 'kolik-nasporim' && (
+                <div className="input-group">
+                  <div className="input-label">Měsíční investice</div>
+                  <div className="input-row">
+                    <input className="input-field" type="number" value={monthly} min={100} max={100000} step={100} onChange={e => setMonthly(Math.max(0, Number(e.target.value)))} />
+                    <span className="input-unit">Kč</span>
+                  </div>
                 </div>
-              </div>
-              <div className="input-group">
-                <div className="input-label">Investiční horizont — {years} let</div>
-                <div className="slider-row">
-                  <input className="slider" type="range" min={1} max={40} value={years} onChange={e => setYears(Number(e.target.value))} style={{background:`linear-gradient(to right,#c8a96e ${(years-1)/39*100}%,rgba(255,255,255,0.1) ${(years-1)/39*100}%)`}} />
-                  <span className="slider-value">{years} let</span>
+              )}
+              {mode === 'castka' && (
+                <div className="input-group">
+                  <div className="input-label">Chci mít celkem</div>
+                  <div className="input-row">
+                    <input className="input-field" type="number" value={target} min={10000} step={10000} onChange={e => setTarget(Math.max(0, Number(e.target.value)))} />
+                    <span className="input-unit">Kč</span>
+                  </div>
+                  <div style={{display:'flex',gap:'0.5rem',marginTop:'0.65rem',flexWrap:'wrap'}}>
+                    {[500000,1000000,2000000,5000000].map(v => (
+                      <button key={v} onClick={() => setTarget(v)} style={{padding:'0.3rem 0.75rem',borderRadius:'8px',border:`1px solid ${target===v?'rgba(200,169,110,0.4)':'rgba(255,255,255,0.08)'}`,background:target===v?'rgba(200,169,110,0.1)':'transparent',color:target===v?'#c8a96e':'rgba(240,237,232,0.4)',fontSize:'0.75rem',cursor:'pointer',fontFamily:"'DM Sans',sans-serif"}}>
+                        {v>=1000000?`${v/1000000} mil.`:`${v/1000} tis.`}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div className="input-group">
-                <div className="input-label">Průměrný roční výnos — {rate} %</div>
-                <div className="slider-row">
-                  <input className="slider" type="range" min={1} max={15} step={0.5} value={rate} onChange={e => setRate(Number(e.target.value))} style={{background:`linear-gradient(to right,#c8a96e ${(rate-1)/14*100}%,rgba(255,255,255,0.1) ${(rate-1)/14*100}%)`}} />
-                  <span className="slider-value">{rate} %</span>
-                </div>
-              </div>
-              <div className="input-group">
-                <div className="input-label">Průměrná roční inflace — {inflation} %</div>
-                <div className="slider-row">
-                  <input className="slider" type="range" min={0.5} max={10} step={0.5} value={inflation} onChange={e => setInflation(Number(e.target.value))} style={{background:`linear-gradient(to right,#e07a78 ${(inflation-0.5)/9.5*100}%,rgba(255,255,255,0.1) ${(inflation-0.5)/9.5*100}%)`}} />
-                  <span className="slider-value" style={{color:'#e07a78'}}>{inflation} %</span>
-                </div>
-              </div>
+              )}
+              {mode === 'renta' && (
+                <>
+                  <div className="input-group">
+                    <div className="input-label">Chci měsíčně vybírat</div>
+                    <div className="input-row">
+                      <input className="input-field" type="number" value={renta} min={1000} step={1000} onChange={e => setRenta(Math.max(0, Number(e.target.value)))} />
+                      <span className="input-unit">Kč/měs.</span>
+                    </div>
+                  </div>
+                  <SliderWithInput label="Po dobu" value={rentaYears} min={5} max={40} unit="let" onChange={setRentaYears} />
+                </>
+              )}
+              <SliderWithInput label="Investiční horizont" value={years} min={1} max={40} unit="let" onChange={setYears} />
+              <SliderWithInput label="Průměrný roční výnos" value={rate} min={1} max={15} step={0.5} unit="%" onChange={setRate} />
+              {mode === 'kolik-nasporim' && (
+                <SliderWithInput label="Průměrná roční inflace" value={inflation} min={0.5} max={10} step={0.5} unit="%" color="#e07a78" onChange={setInflation} />
+              )}
             </div>
 
-            <div className="results">
-              <div className="results-grid">
-                <div className="result-item">
-                  <div className="result-value">{formatCZK(result.invested)}</div>
-                  <div className="result-label">Vloženo celkem</div>
+            {mode === 'kolik-nasporim' && (
+              <>
+                <div className="results">
+                  <div className="results-grid">
+                    <div className="result-item"><div className="result-value">{formatCZK(result.invested)}</div><div className="result-label">Vloženo celkem</div></div>
+                    <div className="result-item"><div className="result-value green">{formatCZK(result.profit)}</div><div className="result-label">Výnos z úroků</div></div>
+                    <div className="result-item result-total"><div className="result-value highlight">{formatCZK(result.total)}</div><div className="result-label">Celková hodnota portfolia</div></div>
+                  </div>
+                  <div className="divider" />
+                  <div className="chart-wrap">
+                    <div className="chart-bars">
+                      {chartPoints.map((p, i) => {
+                        const totalH = (p.total / maxTotal) * 100;
+                        const investedH = (p.invested / maxTotal) * 100;
+                        return (
+                          <div key={i} className="bar-group">
+                            <div className="bar-inner">
+                              <div className="bar-profit" style={{height:`${totalH - investedH}%`}} />
+                              <div className="bar-invested" style={{height:`${investedH}%`}} />
+                            </div>
+                            <div className="bar-label">{p.year}r</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="chart-legend">
+                    <div className="legend-item"><div className="legend-dot" style={{background:'rgba(255,255,255,0.15)'}} />Vloženo</div>
+                    <div className="legend-item"><div className="legend-dot" style={{background:'#c8a96e'}} />Výnos z úroků</div>
+                  </div>
                 </div>
-                <div className="result-item">
-                  <div className="result-value green">{formatCZK(result.profit)}</div>
-                  <div className="result-label">Výnos z úroků</div>
+                <div style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:'16px',padding:'1.25rem',marginBottom:'1.75rem'}}>
+                  <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(240,237,232,0.35)',marginBottom:'0.875rem'}}>Nominálně vs. reálně po inflaci</div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem',marginBottom:'0.875rem'}}>
+                    <div><div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Nominální hodnota</div><div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:900,color:'#c8a96e'}}>{formatCZK(result.total)}</div></div>
+                    <div><div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Reálná hodnota (po inflaci)</div><div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:900,color:realProfit>0?'#4a7c59':'#e07a78'}}>{formatCZK(realTotal)}</div></div>
+                  </div>
+                  <div style={{height:'1px',background:'rgba(255,255,255,0.05)',margin:'0.875rem 0'}} />
+                  <div style={{fontSize:'0.82rem',color:'rgba(240,237,232,0.5)'}}>
+                    {realProfit>0?`✓ Reálný zisk po inflaci: ${formatCZK(realProfit)}`:`⚠ Inflace spolkne ${formatCZK(Math.abs(inflationLoss))} tvého výnosu`}
+                  </div>
                 </div>
-                <div className="result-item result-total">
-                  <div className="result-value highlight">{formatCZK(result.total)}</div>
-                  <div className="result-label">Celková hodnota portfolia</div>
+              </>
+            )}
+
+            {(mode === 'castka' || mode === 'renta') && (
+              <div style={{background:'rgba(200,169,110,0.06)',border:'1px solid rgba(200,169,110,0.2)',borderRadius:'18px',padding:'1.5rem',marginBottom:'1.75rem'}}>
+                {mode === 'renta' && (
+                  <div style={{fontSize:'0.78rem',color:'rgba(240,237,232,0.5)',marginBottom:'1rem',textAlign:'center'}}>
+                    Pro rentu {formatCZK(renta)}/měs. po {rentaYears} let potřebuješ naspořit <strong style={{color:'#f0ede8'}}>{formatCZK(neededTarget)}</strong>
+                  </div>
+                )}
+                <div style={{textAlign:'center',marginBottom:'1.25rem'}}>
+                  <div style={{fontSize:'0.72rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(240,237,232,0.4)',marginBottom:'0.5rem'}}>Musíš každý měsíc investovat</div>
+                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:'clamp(2rem,6vw,2.8rem)',fontWeight:900,color:'#c8a96e',lineHeight:1}}>{formatCZK(monthlyNeeded)}</div>
+                  <div style={{fontSize:'0.82rem',color:'rgba(240,237,232,0.4)',marginTop:'0.5rem'}}>měsíčně po dobu {years} let</div>
                 </div>
-              </div>
-              <div className="divider" />
-              <div className="chart-wrap">
-                <div className="chart-bars">
-                  {chartPoints.map((p, i) => {
-                    const totalH = (p.total / maxTotal) * 100;
-                    const investedH = (p.invested / maxTotal) * 100;
-                    return (
-                      <div key={i} className="bar-group">
-                        <div className="bar-inner">
-                          <div className="bar-profit" style={{height:`${totalH - investedH}%`}} />
-                          <div className="bar-invested" style={{height:`${investedH}%`}} />
-                        </div>
-                        <div className="bar-label">{p.year}r</div>
+                <div style={{height:'1px',background:'rgba(255,255,255,0.06)',margin:'1.25rem 0'}} />
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem',marginBottom:'1.25rem'}}>
+                  <div><div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Celkem vložíš</div><div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:700,color:'#f0ede8'}}>{formatCZK(totalInvested)}</div></div>
+                  <div><div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Z toho vydělají úroky</div><div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:700,color:goalProfit>0?'#4a7c59':'#e07a78'}}>{goalProfit>0?'+':''}{formatCZK(goalProfit)}</div></div>
+                </div>
+                <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(240,237,232,0.35)',marginBottom:'0.75rem'}}>Jak roste portfolio v čase</div>
+                <div style={{display:'flex',flexDirection:'column',gap:'0.5rem'}}>
+                  {milestones.map(m => (
+                    <div key={m.year} style={{display:'flex',alignItems:'center',gap:'0.875rem'}}>
+                      <span style={{fontSize:'0.78rem',color:'rgba(240,237,232,0.4)',width:'3.5rem',flexShrink:0}}>Za {m.year} let</span>
+                      <div style={{flex:1,height:'8px',background:'rgba(255,255,255,0.06)',borderRadius:'4px',overflow:'hidden'}}>
+                        <div style={{height:'100%',borderRadius:'4px',background:'linear-gradient(90deg,rgba(200,169,110,0.4),#c8a96e)',width:`${Math.min((m.value/neededTarget)*100,100)}%`,transition:'width 0.4s'}} />
                       </div>
-                    );
-                  })}
+                      <span style={{fontSize:'0.78rem',fontFamily:"'Playfair Display',serif",fontWeight:700,color:'rgba(240,237,232,0.6)',width:'6rem',textAlign:'right',flexShrink:0}}>{formatCZK(m.value)}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="chart-legend">
-                <div className="legend-item"><div className="legend-dot" style={{background:'rgba(255,255,255,0.15)'}} />Vloženo</div>
-                <div className="legend-item"><div className="legend-dot" style={{background:'#c8a96e'}} />Výnos z úroků</div>
-              </div>
-            </div>
-
-            <div style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:'16px',padding:'1.25rem',marginBottom:'1.75rem'}}>
-              <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(240,237,232,0.35)',marginBottom:'0.875rem'}}>Nominálně vs. reálně po inflaci</div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem',marginBottom:'0.875rem'}}>
-                <div>
-                  <div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Nominální hodnota</div>
-                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:900,color:'#c8a96e'}}>{formatCZK(result.total)}</div>
-                </div>
-                <div>
-                  <div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Reálná hodnota (po inflaci)</div>
-                  <div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:900,color: realProfit > 0 ? '#4a7c59' : '#e07a78'}}>{formatCZK(realTotal)}</div>
-                </div>
-              </div>
-              <div style={{height:'1px',background:'rgba(255,255,255,0.05)',margin:'0.875rem 0'}} />
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <div style={{fontSize:'0.82rem',color:'rgba(240,237,232,0.5)'}}>
-                  {realProfit > 0
-                    ? `✓ Reálný zisk po inflaci: ${formatCZK(realProfit)}`
-                    : `⚠ Inflace spolkne ${formatCZK(Math.abs(inflationLoss))} tvého výnosu`}
-                </div>
-                <a href="/inflace" style={{fontSize:'0.75rem',color:'#e07a78',textDecoration:'none',whiteSpace:'nowrap',marginLeft:'0.75rem'}}>Inflační kalkulačka →</a>
-              </div>
-            </div>
+            )}
 
             <div className="tools-cta">
               <div className="tools-cta-label">Další nástroje</div>
               <div className="tools-cta-grid">
-                <a href="/kviz" className="tool-cta-card">
-                  <span className="tool-cta-icon">📊</span>
-                  <div><div className="tool-cta-name">Investiční kvíz</div><div className="tool-cta-text">Kde začít investovat?</div></div>
-                </a>
-                <a href="/vynos" className="tool-cta-card">
-                  <span className="tool-cta-icon">⚖️</span>
-                  <div><div className="tool-cta-name">Výnos vs riziko</div><div className="tool-cta-text">Kolik % reálně čekat?</div></div>
-                </a>
-                <a href="/inflace" className="tool-cta-card">
-                  <span className="tool-cta-icon">🔥</span>
-                  <div><div className="tool-cta-name">Inflační kalkulačka</div><div className="tool-cta-text">Co inflace ukradne?</div></div>
-                </a>
+                <a href="/kviz" className="tool-cta-card"><span className="tool-cta-icon">📊</span><div><div className="tool-cta-name">Investiční kvíz</div><div className="tool-cta-text">Kde začít investovat?</div></div></a>
+                <a href="/vynos" className="tool-cta-card"><span className="tool-cta-icon">⚖️</span><div><div className="tool-cta-name">Výnos vs riziko</div><div className="tool-cta-text">Kolik % reálně čekat?</div></div></a>
+                <a href="/inflace" className="tool-cta-card"><span className="tool-cta-icon">🔥</span><div><div className="tool-cta-name">Inflační kalkulačka</div><div className="tool-cta-text">Co inflace ukradne?</div></div></a>
               </div>
             </div>
 
