@@ -130,28 +130,6 @@
   <script type="text/babel">
     const { useState, useMemo } = React;
 
-    function SliderWithInput({ label, value, min, max, step = 1, unit, color = '#e07a78', labelExtra, onChange }) {
-      const [inputVal, setInputVal] = useState(String(value));
-      const pct = (value - min) / (max - min) * 100;
-      const handleSlider = e => { const v = Number(e.target.value); onChange(v); setInputVal(String(v)); };
-      const handleInput = e => { setInputVal(e.target.value); const v = Number(e.target.value); if (!isNaN(v) && v >= min && v <= max) onChange(v); };
-      const handleBlur = () => { const v = Math.min(max, Math.max(min, Number(inputVal) || min)); onChange(v); setInputVal(String(v)); };
-      return (
-        <div className="input-group">
-          <div className="input-label">{labelExtra ? labelExtra : label}</div>
-          <div className="slider-row">
-            <input className="slider" type="range" min={min} max={max} step={step} value={value} onChange={handleSlider}
-              style={{background:`linear-gradient(to right,${color} ${pct}%,rgba(255,255,255,0.1) ${pct}%)`}} />
-            <div style={{display:'flex',alignItems:'center',gap:'0.3rem',flexShrink:0}}>
-              <input type="number" value={inputVal} min={min} max={max} step={step} onChange={handleInput} onBlur={handleBlur}
-                style={{width:'3.5rem',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'8px',padding:'0.25rem 0.4rem',color,fontFamily:"'Playfair Display',serif",fontSize:'0.95rem',fontWeight:700,outline:'none',textAlign:'center'}} />
-              <span style={{fontSize:'0.8rem',color:'rgba(240,237,232,0.4)'}}>{unit}</span>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
     function formatCZK(value) {
       if (value >= 1000000) return (value / 1000000).toFixed(2).replace('.', ',') + ' mil. Kč';
       return Math.round(value).toLocaleString('cs-CZ') + ' Kč';
@@ -161,16 +139,37 @@
       return amount / Math.pow(1 + rate / 100, years);
     }
 
-    function calcSporiak(amount, years, sporRate, inflRate) {
-      const nominal = amount * Math.pow(1 + sporRate / 100, years);
-      const real = nominal / Math.pow(1 + inflRate / 100, years);
-      return { nominal, real };
-    }
-
-    function calcETF(amount, years, etfRate, inflRate) {
-      const nominal = amount * Math.pow(1 + etfRate / 100, years);
-      const real = nominal / Math.pow(1 + inflRate / 100, years);
-      return { nominal, real };
+    function SliderWithInput({ label, value, min, max, step, unit, tooltipText, onChange }) {
+      step = step || 1;
+      const [inputVal, setInputVal] = useState(String(value));
+      const pct = (value - min) / (max - min) * 100;
+      const handleSlider = e => { const v = Number(e.target.value); onChange(v); setInputVal(String(v)); };
+      const handleInput = e => { setInputVal(e.target.value); const v = Number(e.target.value); if (!isNaN(v) && v >= min && v <= max) onChange(v); };
+      const handleBlur = () => { const v = Math.min(max, Math.max(min, Number(inputVal) || min)); onChange(v); setInputVal(String(v)); };
+      return (
+        <div className="input-group">
+          <div className="input-label">
+            <div className="label-row">
+              {label}
+              {tooltipText && (
+                <div className="tooltip-wrap">
+                  <div className="tooltip-icon">?</div>
+                  <div className="tooltip-box">{tooltipText}</div>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="slider-row">
+            <input className="slider" type="range" min={min} max={max} step={step} value={value} onChange={handleSlider}
+              style={{background:`linear-gradient(to right,#e07a78 ${pct}%,rgba(255,255,255,0.1) ${pct}%)`}} />
+            <div style={{display:'flex',alignItems:'center',gap:'0.3rem',flexShrink:0}}>
+              <input type="number" value={inputVal} min={min} max={max} step={step} onChange={handleInput} onBlur={handleBlur}
+                style={{width:'3.5rem',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'8px',padding:'0.25rem 0.4rem',color:'#e07a78',fontFamily:"'Playfair Display',serif",fontSize:'0.95rem',fontWeight:700,outline:'none',textAlign:'center',MozAppearance:'textfield',WebkitAppearance:'none'}} />
+              <span style={{fontSize:'0.8rem',color:'rgba(240,237,232,0.4)'}}>{unit}</span>
+            </div>
+          </div>
+        </div>
+      );
     }
 
     function App() {
@@ -182,21 +181,23 @@
       const loss = amount - realValue;
       const lossPct = (loss / amount * 100).toFixed(1);
 
-      const sporiak = useMemo(() => calcSporiak(amount, years, 3.5, inflation), [amount, years, inflation]);
-      const etf = useMemo(() => calcETF(amount, years, 8, inflation), [amount, years, inflation]);
+      const sporNominal = useMemo(() => amount * Math.pow(1 + 3.5 / 100, years), [amount, years]);
+      const sporReal = useMemo(() => sporNominal / Math.pow(1 + inflation / 100, years), [sporNominal, years, inflation]);
+      const etfNominal = useMemo(() => amount * Math.pow(1 + 8 / 100, years), [amount, years]);
+      const etfReal = useMemo(() => etfNominal / Math.pow(1 + inflation / 100, years), [etfNominal, years, inflation]);
 
       const timelineYears = [5, 10, 15, 20, 25, 30].filter(y => y <= Math.max(years, 30));
-      const maxVal = amount;
 
       const shockMsg = useMemo(() => {
-        if (lossPct > 50) return `Více než polovina tvých peněz zmizí. Za ${years} let budeš mít reálně jen ${formatCZK(realValue)} — přitom nominálně tam pořád leží ${formatCZK(amount)}.`;
-        if (lossPct > 30) return `Téměř třetina tvých úspor se vypaří — bez jediné transakce, bez jediného výběru. Jen tím že nic neděláš.`;
-        return `Inflace je tichý zloděj. I "nízká" inflace za ${years} let spolkne ${formatCZK(loss)} z tvých úspor.`;
+        if (lossPct > 50) return "Více než polovina tvých peněz zmizí. Za " + years + " let budeš mít reálně jen " + formatCZK(realValue) + " — přitom nominálně tam pořád leží " + formatCZK(amount) + ".";
+        if (lossPct > 30) return "Téměř třetina tvých úspor se vypaří — bez jediné transakce, bez jediného výběru. Jen tím že nic neděláš.";
+        return "Inflace je tichý zloděj. I \"nízká\" inflace za " + years + " let spolkne " + formatCZK(loss) + " z tvých úspor.";
       }, [lossPct, years, realValue, amount, loss]);
 
       return (
         <div className="root">
-          <div className="bg-orb bg-orb-1" /><div className="bg-orb bg-orb-2" />
+          <div className="bg-orb bg-orb-1" />
+          <div className="bg-orb bg-orb-2" />
           <div className="card">
             <div className="badge">Inflační kalkulačka</div>
             <h1 className="title">Co udělá inflace<br /><span>s tvými penězi?</span></h1>
@@ -206,23 +207,22 @@
               <div className="input-group">
                 <div className="input-label">Částka kterou chceš chránit</div>
                 <div className="input-row">
-                  <input className="input-field" type="number" value={amount} min={1000} step={1000} onChange={e => setAmount(Math.max(0, Number(e.target.value)))} />
+                  <input className="input-field" type="number" value={amount} min={1000} step={1000}
+                    onChange={e => setAmount(Math.max(0, Number(e.target.value)))} />
                   <span className="input-unit">Kč</span>
                 </div>
               </div>
-              <SliderWithInput label="Časový horizont" value={years} min={1} max={40} unit="let" onChange={setYears} />
+
+              <SliderWithInput
+                label="Časový horizont"
+                value={years} min={1} max={40} unit="let"
+                onChange={setYears}
+              />
+
               <SliderWithInput
                 label="Průměrná roční inflace"
                 value={inflation} min={0.5} max={15} step={0.5} unit="%"
-                labelExtra={
-                  <div className="label-row">
-                    Průměrná roční inflace
-                    <div className="tooltip-wrap">
-                      <div className="tooltip-icon">?</div>
-                      <div className="tooltip-box">Průměrná inflace v ČR za posledních 10 let byla ~3,5 % p.a. V letech 2021–2023 dosáhla až 15 %. Výchozí hodnota 3,5 % odpovídá dlouhodobému průměru ČNB.</div>
-                    </div>
-                  </div>
-                }
+                tooltipText="Průměrná inflace v ČR za posledních 10 let byla ~3,5 % p.a. V letech 2021–2023 dosáhla až 15 %. Výchozí hodnota 3,5 % odpovídá dlouhodobému průměru ČNB."
                 onChange={setInflation}
               />
             </div>
@@ -239,8 +239,8 @@
                 </div>
                 <div className="result-item result-full">
                   <div className="result-label">Ztráta kupní síly</div>
-                  <div className={`result-value ${loss > 0 ? 'loss' : 'green'}`}>
-                    {loss > 0 ? `− ${formatCZK(loss)} (−${lossPct} %)` : `+${formatCZK(Math.abs(loss))}`}
+                  <div className={loss > 0 ? "result-value loss" : "result-value green"}>
+                    {loss > 0 ? ("− " + formatCZK(loss) + " (−" + lossPct + " %)") : ("+" + formatCZK(Math.abs(loss)))}
                   </div>
                 </div>
               </div>
@@ -251,12 +251,12 @@
               <div className="timeline">
                 {timelineYears.map(y => {
                   const val = calcInflation(amount, y, inflation);
-                  const pct = (val / maxVal) * 100;
+                  const pct = (val / amount) * 100;
                   return (
                     <div key={y} className="timeline-row">
                       <span className="timeline-year">Za {y} let</span>
                       <div className="timeline-bar-wrap">
-                        <div className="timeline-bar" style={{width:`${pct}%`}} />
+                        <div className="timeline-bar" style={{width: pct + "%"}} />
                       </div>
                       <span className="timeline-val">{formatCZK(val)}</span>
                     </div>
@@ -272,14 +272,13 @@
                 </div>
                 <div className="comparison-row">
                   <span className="comparison-name">🏦 Spořicí účet (3,5 % p.a.)</span>
-                  <span className={`comparison-val ${sporiak.real > amount ? 'good' : 'bad'}`}>{formatCZK(sporiak.real)}</span>
+                  <span className={sporReal > amount ? "comparison-val good" : "comparison-val bad"}>{formatCZK(sporReal)}</span>
                 </div>
                 <div className="comparison-row">
                   <span className="comparison-name">📊 ETF index (8 % p.a.)</span>
-                  <span className="comparison-val good">{formatCZK(etf.real)}</span>
+                  <span className="comparison-val good">{formatCZK(etfReal)}</span>
                 </div>
               </div>
-            </div>
             </div>
 
             <div className="cta-section">
@@ -292,11 +291,17 @@
               <div className="tools-cta-grid">
                 <a href="/kalkulacka" className="tool-cta-card">
                   <span className="tool-cta-icon">📈</span>
-                  <div><div className="tool-cta-name">Kalkulačka výnosu</div><div className="tool-cta-text">Složené úročení</div></div>
+                  <div>
+                    <div className="tool-cta-name">Kalkulačka výnosu</div>
+                    <div className="tool-cta-text">Složené úročení</div>
+                  </div>
                 </a>
                 <a href="/vynos" className="tool-cta-card">
                   <span className="tool-cta-icon">⚖️</span>
-                  <div><div className="tool-cta-name">Výnos vs riziko</div><div className="tool-cta-text">Kolik % čekat?</div></div>
+                  <div>
+                    <div className="tool-cta-name">Výnos vs riziko</div>
+                    <div className="tool-cta-text">Kolik % čekat?</div>
+                  </div>
                 </a>
               </div>
             </div>
