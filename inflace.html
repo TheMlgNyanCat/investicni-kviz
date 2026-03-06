@@ -130,6 +130,28 @@
   <script type="text/babel">
     const { useState, useMemo } = React;
 
+    function SliderWithInput({ label, value, min, max, step = 1, unit, color = '#e07a78', labelExtra, onChange }) {
+      const [inputVal, setInputVal] = useState(String(value));
+      const pct = (value - min) / (max - min) * 100;
+      const handleSlider = e => { const v = Number(e.target.value); onChange(v); setInputVal(String(v)); };
+      const handleInput = e => { setInputVal(e.target.value); const v = Number(e.target.value); if (!isNaN(v) && v >= min && v <= max) onChange(v); };
+      const handleBlur = () => { const v = Math.min(max, Math.max(min, Number(inputVal) || min)); onChange(v); setInputVal(String(v)); };
+      return (
+        <div className="input-group">
+          <div className="input-label">{labelExtra ? labelExtra : label}</div>
+          <div className="slider-row">
+            <input className="slider" type="range" min={min} max={max} step={step} value={value} onChange={handleSlider}
+              style={{background:`linear-gradient(to right,${color} ${pct}%,rgba(255,255,255,0.1) ${pct}%)`}} />
+            <div style={{display:'flex',alignItems:'center',gap:'0.3rem',flexShrink:0}}>
+              <input type="number" value={inputVal} min={min} max={max} step={step} onChange={handleInput} onBlur={handleBlur}
+                style={{width:'3.5rem',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.12)',borderRadius:'8px',padding:'0.25rem 0.4rem',color,fontFamily:"'Playfair Display',serif",fontSize:'0.95rem',fontWeight:700,outline:'none',textAlign:'center'}} />
+              <span style={{fontSize:'0.8rem',color:'rgba(240,237,232,0.4)'}}>{unit}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     function formatCZK(value) {
       if (value >= 1000000) return (value / 1000000).toFixed(2).replace('.', ',') + ' mil. Kč';
       return Math.round(value).toLocaleString('cs-CZ') + ' Kč';
@@ -188,31 +210,21 @@
                   <span className="input-unit">Kč</span>
                 </div>
               </div>
-              <div className="input-group">
-                <div className="input-label">Časový horizont — {years} let</div>
-                <div className="slider-row">
-                  <input className="slider" type="range" min={1} max={40} value={years} onChange={e => setYears(Number(e.target.value))}
-                    style={{background:`linear-gradient(to right,#e07a78 ${(years-1)/39*100}%,rgba(255,255,255,0.1) ${(years-1)/39*100}%)`}} />
-                  <span className="slider-value">{years} let</span>
-                </div>
-              </div>
-              <div className="input-group">
-                <div className="input-label">
+              <SliderWithInput label="Časový horizont" value={years} min={1} max={40} unit="let" onChange={setYears} />
+              <SliderWithInput
+                label="Průměrná roční inflace"
+                value={inflation} min={0.5} max={15} step={0.5} unit="%"
+                labelExtra={
                   <div className="label-row">
-                    Průměrná roční inflace — {inflation} %
+                    Průměrná roční inflace
                     <div className="tooltip-wrap">
                       <div className="tooltip-icon">?</div>
-                      <div className="tooltip-box">
-                        Průměrná inflace v ČR za posledních 10 let byla ~3,5 % p.a. V letech 2021–2023 dosáhla až 15 %. Výchozí hodnota 3,5 % odpovídá dlouhodobému průměru ČNB.
-                      </div>
+                      <div className="tooltip-box">Průměrná inflace v ČR za posledních 10 let byla ~3,5 % p.a. V letech 2021–2023 dosáhla až 15 %. Výchozí hodnota 3,5 % odpovídá dlouhodobému průměru ČNB.</div>
                     </div>
                   </div>
-                </div>
-                <div className="slider-row">
-                  <input className="slider" type="range" min={0.5} max={15} step={0.5} value={inflation} onChange={e => setInflation(Number(e.target.value))}
-                    style={{background:`linear-gradient(to right,#e07a78 ${(inflation-0.5)/14.5*100}%,rgba(255,255,255,0.1) ${(inflation-0.5)/14.5*100}%)`}} />
-                  <span className="slider-value">{inflation} %</span>
-                </div>
+                }
+                onChange={setInflation}
+              />
               </div>
             </div>
 
@@ -266,8 +278,6 @@
                 <div className="comparison-row">
                   <span className="comparison-name">📊 ETF index (8 % p.a.)</span>
                   <span className="comparison-val good">{formatCZK(etf.real)}</span>
-                </div>
-              </div>
             </div>
 
             <div className="cta-section">
