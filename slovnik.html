@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Investiční slovník pojmů | investicnitest.cz</title>
+  <meta name="description" content="Vysvětlení nejdůležitějších investičních pojmů. ETF, dividenda, P/E ratio, diverzifikace a dalších 36 pojmů — srozumitelně, bez finančního žargonu." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.investicnitest.cz/slovnik" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.investicnitest.cz/slovnik" />
+  <meta property="og:title" content="Investiční slovník pojmů" />
+  <meta property="og:description" content="40 nejdůležitějších investičních pojmů vysvětlených srozumitelně. Zdarma." />
+  <meta property="og:locale" content="cs_CZ" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "DefinedTermSet",
+    "name": "Investiční slovník pojmů",
+    "description": "40 nejdůležitějších investičních pojmů vysvětlených srozumitelně.",
+    "url": "https://www.investicnitest.cz/slovnik",
+    "inLanguage": "cs"
+  }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0f; color: #f0ede8; font-family: 'DM Sans', sans-serif; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; background: rgba(10,10,15,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .nav-logo { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: #f0ede8; text-decoration: none; }
+    .nav-logo span { color: #c8a96e; }
+    .nav-links { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+    .nav-link { padding: 0.4rem 0.75rem; border-radius: 8px; font-size: 0.8rem; color: rgba(240,237,232,0.5); text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+    .nav-link:hover { color: #f0ede8; background: rgba(255,255,255,0.05); }
+    .nav-link.active { color: #c8a96e; }
+
+    .page { max-width: 860px; margin: 0 auto; padding: 6rem 1.25rem 4rem; position: relative; }
+
+    .bg-orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
+    .bg-orb-1 { width: 500px; height: 500px; background: #c8a96e; top: -150px; right: -150px; opacity: 0.06; }
+    .bg-orb-2 { width: 400px; height: 400px; background: #4a7c59; bottom: 0; left: -100px; opacity: 0.06; }
+
+    .hero { position: relative; z-index: 1; margin-bottom: 2.5rem; }
+    .hero-badge { display: inline-block; background: rgba(200,169,110,0.12); border: 1px solid rgba(200,169,110,0.25); border-radius: 100px; padding: 0.4rem 1.2rem; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #c8a96e; margin-bottom: 1rem; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; line-height: 1.15; margin-bottom: 0.75rem; }
+    .hero-title span { color: #c8a96e; }
+    .hero-sub { color: rgba(240,237,232,0.5); font-size: 0.95rem; line-height: 1.7; max-width: 560px; margin-bottom: 1.5rem; }
+
+    /* Search */
+    .search-wrap { position: relative; max-width: 480px; margin-bottom: 2.5rem; }
+    .search-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 0.875rem 1rem 0.875rem 2.75rem; color: #f0ede8; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+    .search-input::placeholder { color: rgba(240,237,232,0.3); }
+    .search-input:focus { border-color: rgba(200,169,110,0.4); }
+    .search-icon { position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); color: rgba(240,237,232,0.3); font-size: 1rem; pointer-events: none; }
+
+    /* Sections */
+    .section { position: relative; z-index: 1; margin-bottom: 2.5rem; }
+    .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .section-icon { font-size: 1.2rem; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: #f0ede8; }
+    .section-count { font-size: 0.72rem; color: rgba(240,237,232,0.3); background: rgba(255,255,255,0.06); border-radius: 100px; padding: 0.2rem 0.6rem; }
+
+    /* Term cards */
+    .terms-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+    .term-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 1.25rem 1.5rem; cursor: pointer; transition: all 0.2s; }
+    .term-card:hover { border-color: rgba(200,169,110,0.25); background: rgba(200,169,110,0.04); }
+    .term-card.open { border-color: rgba(200,169,110,0.3); background: rgba(200,169,110,0.06); }
+    .term-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .term-name { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: #f0ede8; }
+    .term-en { font-size: 0.78rem; color: rgba(240,237,232,0.35); font-style: italic; margin-left: 0.5rem; }
+    .term-arrow { color: rgba(240,237,232,0.3); font-size: 0.8rem; transition: transform 0.2s; flex-shrink: 0; }
+    .term-card.open .term-arrow { transform: rotate(180deg); color: #c8a96e; }
+    .term-body { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .term-card.open .term-body { display: block; }
+    .term-desc { font-size: 0.88rem; color: rgba(240,237,232,0.65); line-height: 1.75; margin-bottom: 0.875rem; }
+    .term-example { background: rgba(255,255,255,0.03); border-left: 3px solid #c8a96e; border-radius: 0 8px 8px 0; padding: 0.65rem 0.875rem; font-size: 0.82rem; color: rgba(240,237,232,0.5); line-height: 1.6; margin-bottom: 0.875rem; }
+    .term-example strong { color: #c8a96e; }
+    .term-link { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: rgba(200,169,110,0.7); text-decoration: none; border: 1px solid rgba(200,169,110,0.2); border-radius: 8px; padding: 0.3rem 0.75rem; transition: all 0.2s; }
+    .term-link:hover { color: #c8a96e; border-color: rgba(200,169,110,0.4); background: rgba(200,169,110,0.08); }
+
+    /* No results */
+    .no-results { text-align: center; padding: 3rem; color: rgba(240,237,232,0.3); font-size: 0.95rem; display: none; }
+    .no-results.visible { display: block; }
+
+    /* CTA */
+    .bottom-cta { position: relative; z-index: 1; background: rgba(200,169,110,0.06); border: 1px solid rgba(200,169,110,0.15); border-radius: 20px; padding: 2rem; text-align: center; margin-top: 1rem; }
+    .bottom-cta h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .bottom-cta p { color: rgba(240,237,232,0.5); font-size: 0.88rem; margin-bottom: 1.25rem; }
+    .cta-btn { display: inline-block; background: linear-gradient(135deg, #c8a96e, #a8894e); border-radius: 12px; padding: 0.875rem 2rem; color: #0a0a0f; font-size: 0.9rem; font-weight: 500; text-decoration: none; transition: all 0.2s; }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,169,110,0.3); }
+
+    footer { border-top: 1px solid rgba(255,255,255,0.06); padding: 1.5rem 2rem; text-align: center; position: relative; z-index: 1; }
+    footer .f-logo { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-weight: 700; color: rgba(240,237,232,0.4); margin-bottom: 0.75rem; }
+    footer .f-logo span { color: #c8a96e; }
+    footer .f-disc { color: rgba(240,237,232,0.2); font-size: 0.7rem; line-height: 1.6; max-width: 600px; margin: 0 auto 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+
+  <nav>
+    <a href="/" class="nav-logo">investicni<span>test</span>.cz</a>
+    <div class="nav-links">
+      <a href="/kviz" class="nav-link">Kvíz</a>
+      <a href="/kalkulacka" class="nav-link">Úročení</a>
+      <a href="/vynos" class="nav-link">Riziko</a>
+      <a href="/inflace" class="nav-link">Inflace</a>
+      <a href="/slovnik" class="nav-link active">Slovník</a>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="hero">
+      <div class="hero-badge">Investiční slovník</div>
+      <h1 class="hero-title">Pojmy které<br /><span>musíš znát</span></h1>
+      <p class="hero-sub">40 nejdůležitějších investičních pojmů vysvětlených lidsky — bez zbytečného žargonu. Klikni na pojem pro vysvětlení.</p>
+    </div>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" id="searchInput" placeholder="Hledat pojem... (např. ETF, dividenda)" />
+    </div>
+
+    <div id="glossary">
+
+      <!-- SEKCE 1: ZÁKLADY -->
+      <div class="section" data-section>
+        <div class="section-header">
+          <span class="section-icon">📌</span>
+          <span class="section-title">Základní pojmy</span>
+          <span class="section-count">10 pojmů</span>
+        </div>
+        <div class="terms-grid">
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Aktiva</span><span class="term-en">Assets</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Vše co vlastníš a co má finanční hodnotu — akcie, nemovitosti, hotovost, ETF fondy. Opakem jsou pasiva (dluhy). Cílem investování je budovat aktiva která ti generují příjem nebo rostou na hodnotě.</p>
+              <div class="term-example"><strong>Příklad:</strong> Máš 50 000 Kč na spořáku, 10 akcií Applu a byt — to jsou všechno aktiva.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Aktivum" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Broker</span><span class="term-en">Broker</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Zprostředkovatel mezi tebou a burzou. Přes brokera nakupuješ a prodáváš akcie, ETF a další investiční produkty. Moderní brokeři fungují jako mobilní aplikace — XTB, Trading 212, Degiro.</p>
+              <div class="term-example"><strong>Příklad:</strong> Chceš koupit ETF na S&P 500. Otevřeš účet u XTB, vložíš peníze a přes jejich aplikaci ETF koupíš.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Makl%C3%A9%C5%99" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Burza</span><span class="term-en">Stock Exchange</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Organizovaný trh kde se obchodují cenné papíry (akcie, dluhopisy, ETF). Největší světové burzy jsou NYSE a NASDAQ v USA. Česká republika má Burzu cenných papírů Praha (BCPP).</p>
+              <div class="term-example"><strong>Příklad:</strong> Apple je kótovaný na burze NASDAQ — tam se každý den obchodují miliardy jeho akcií.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Burza_cenn%C3%BDch_pap%C3%ADr%C5%AF" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Diverzifikace</span><span class="term-en">Diversification</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Rozložení investic do více různých aktiv, sektorů nebo zemí. Snižuje riziko — pokud jedna investice klesne, ostatní to mohou kompenzovat. Základní pravidlo: nedávej všechna vejce do jednoho košíku.</p>
+              <div class="term-example"><strong>Příklad:</strong> Místo jedné akcie Tesly koupíš ETF které obsahuje 500 různých firem — diverzifikuješ riziko.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Diverzifikace_(finance)" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Inflace</span><span class="term-en">Inflation</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Postupné zdražování zboží a služeb v čase — a tím i snižování kupní síly peněz. Průměrná inflace v ČR je ~3,5 % ročně. Pokud tvé úspory vydělávají méně než inflace, reálně chudneš.</p>
+              <div class="term-example"><strong>Příklad:</strong> Máš 100 000 Kč na spořáku s 2% úrokem. Inflace je 4 %. Reálně ztrácíš 2 % ročně = 2 000 Kč kupní síly.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Inflace" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Likvidita</span><span class="term-en">Liquidity</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Jak rychle a snadno lze aktivum přeměnit na hotovost bez velké ztráty hodnoty. Hotovost je nejlikvidnější, nemovitosti jsou málo likvidní. Akcie na velké burze jsou velmi likvidní.</p>
+              <div class="term-example"><strong>Příklad:</strong> Akcie Applu prodáš za pár sekund. Prodej bytu trvá měsíce — nízká likvidita.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Likvidita" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Portfolium</span><span class="term-en">Portfolio</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Celková skladba tvých investic — součet všech akcií, ETF, dluhopisů a dalších aktiv která vlastníš. Cílem je mít vyvážené portfolio odpovídající tvému rizikového profilu a investičnímu horizontu.</p>
+              <div class="term-example"><strong>Příklad:</strong> Tvé portfolio: 70 % globální ETF, 20 % dluhopisy, 10 % hotovost.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Portfolio_(finance)" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Rebalancing</span><span class="term-en">Rebalancing</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Pravidelná úprava složení portfolia zpět na původní cílové rozložení. Pokud akcie vzrostly a teď tvoří 80 % místo plánovaných 70 %, část prodáš a dokoupíš dluhopisy.</p>
+              <div class="term-example"><strong>Příklad:</strong> Cíl: 70 % akcie / 30 % dluhopisy. Po roce akcie vyrostly na 80 %. Prodáš část akcií a dokoupíš dluhopisy.</div>
+              <a class="term-link" href="https://en.wikipedia.org/wiki/Rebalancing_investments" target="_blank" rel="noopener">Wikipedia (EN) →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Složené úročení</span><span class="term-en">Compound Interest</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Úroky se připisují k jistině a v dalším období vydělávají další úroky — úroky z úroků. Je to nejsilnější síla v osobních financích. Einstein ho prý nazval "osmým divem světa".</p>
+              <div class="term-example"><strong>Příklad:</strong> 10 000 Kč při 7 % ročně: po 10 letech = 19 672 Kč. Po 30 letech = 76 123 Kč. Bez přispívání!</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Slo%C5%BEen%C3%A9_%C3%BAro%C4%8Den%C3%AD" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Výnos</span><span class="term-en">Return / Yield</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Zisk z investice vyjádřený jako procento. Může jít o kapitálový výnos (cena akcie vzrostla) nebo výnosový výnos (dividenda, úrok). Historický průměrný výnos globálních akcií je ~7–8 % ročně po inflaci.</p>
+              <div class="term-example"><strong>Příklad:</strong> Koupil jsi ETF za 10 000 Kč, teď má hodnotu 10 700 Kč. Výnos = 7 %.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/V%C3%BDnosnost" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SEKCE 2: TYPY INVESTIC -->
+      <div class="section" data-section>
+        <div class="section-header">
+          <span class="section-icon">📊</span>
+          <span class="section-title">Typy investic</span>
+          <span class="section-count">12 pojmů</span>
+        </div>
+        <div class="terms-grid">
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Akcie</span><span class="term-en">Stock / Share</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Podíl ve firmě. Koupí akcie se stáváš spolumajitelem části firmy. Hodnota akcie roste nebo klesá podle výkonnosti firmy a tržního sentimentu. Akcie jsou dlouhodobě nejvýnosnější třída aktiv, ale také rizikovější.</p>
+              <div class="term-example"><strong>Příklad:</strong> Koupíš 1 akcii Applu za 200 $. Vlastníš tím malý podíl v Apple Inc. Pokud firma roste, akcie zdraží.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Akcie" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Dluhopis</span><span class="term-en">Bond</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Půjčka firmě nebo státu — za což dostáváš pravidelný úrok (kupón) a na konci vrácení jistiny. Dluhopisy jsou méně rizikové než akcie, ale přinášejí nižší výnosy. Vhodné pro konzervativní investory.</p>
+              <div class="term-example"><strong>Příklad:</strong> Koupíš státní dluhopis za 10 000 Kč na 5 let s 3% kupónem. Ročně dostaneš 300 Kč úrok a po 5 letech 10 000 Kč zpět.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Dluhopis" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">ETF</span><span class="term-en">Exchange-Traded Fund</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Fond obchodovaný na burze který sleduje index (např. S&P 500) nebo sektor. Jedna koupě ETF = automatická diverzifikace do stovek nebo tisíců firem. Nízké poplatky, snadná dostupnost. Ideální pro začátečníky.</p>
+              <div class="term-example"><strong>Příklad:</strong> ETF "VWCE" od Vanguartu obsahuje ~3700 firem z celého světa. Koupí jednoho ETF investuješ globálně.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Burzovn%C4%9B_obchodovan%C3%BD_fond" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Index</span><span class="term-en">Index</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Ukazatel výkonnosti skupiny akcií. S&P 500 sleduje 500 největších amerických firem, MSCI World sleduje tisíce firem po celém světě. ETF indexové fondy tyto indexy kopírují.</p>
+              <div class="term-example"><strong>Příklad:</strong> "S&P 500 vzrostl o 2 %" znamená, že průměrná hodnota 500 největších amerických firem vzrostla o 2 %.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Burzovn%C3%AD_index" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Kryptoměna</span><span class="term-en">Cryptocurrency</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Digitální měna fungující na technologii blockchain — decentralizovaná, bez centrální banky. Bitcoin, Ethereum a tisíce dalších. Vysoká volatilita = vysoký potenciální výnos, ale také vysoké riziko ztráty.</p>
+              <div class="term-example"><strong>Příklad:</strong> Bitcoin v roce 2021 stál 65 000 $. V roce 2022 klesl na 16 000 $. V roce 2024 překonal 100 000 $.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Kryptom%C4%9Bna" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Nemovitost</span><span class="term-en">Real Estate</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Investice do fyzické nemovitosti (byt, dům, komerční prostor) nebo nepřímo přes REITs (fondy nemovitostí). Výnos pochází z nájmu a růstu hodnoty. Nízká likvidita, vysoký vstupní kapitál.</p>
+              <div class="term-example"><strong>Příklad:</strong> Koupíš byt za 4 mil. Kč a pronajímáš ho za 15 000 Kč měsíčně. Roční výnos z nájmu ~4,5 %.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Nemovitost" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Podílový fond</span><span class="term-en">Mutual Fund</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Fond kde správce aktivně vybírá investice. Na rozdíl od ETF je aktivně řízen — správce se snaží překonat trh. Vyšší poplatky než ETF. Většina aktivních fondů dlouhodobě trh nepřekoná.</p>
+              <div class="term-example"><strong>Příklad:</strong> Podílový fond vybírá 30 "nejlepších" akcií. Za správu platíš 1,5 % ročně. ETF kopírující S&P 500 stojí 0,07 % ročně.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Pod%C3%ADlov%C3%BD_fond" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">REIT</span><span class="term-en">Real Estate Investment Trust</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Fond investující do nemovitostí — obchodovaný na burze jako akcie. Umožňuje investovat do nemovitostí s malým kapitálem. Povinně vyplácí 90 % zisku jako dividendy.</p>
+              <div class="term-example"><strong>Příklad:</strong> Koupíš REIT za 1 000 Kč a nepřímo vlastníš podíl v desítkách kancelářských budov nebo nákupních center.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/REIT" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Roboadvisor</span><span class="term-en">Robo-advisor</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Automatizovaná investiční platforma — algoritmus sestaví a spravuje portfolio za tebe. Ideální pro začátečníky bez znalostí. V ČR jsou nejznámější Portu a Fondee.</p>
+              <div class="term-example"><strong>Příklad:</strong> Otevřeš účet u Portu, odpovíš na 5 otázek o riziku, nastavíš 2 000 Kč měsíčně a algoritmus se stará o zbytek.</div>
+              <a class="term-link" href="https://en.wikipedia.org/wiki/Robo-advisor" target="_blank" rel="noopener">Wikipedia (EN) →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Spořicí účet</span><span class="term-en">Savings Account</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Bankovní produkt s úrokem vyšším než běžný účet. Bezpečný, likvidní, pojištěný do 100 000 EUR. Úrok ale málokdy překoná inflaci — vhodný pro finanční rezervu, ne pro dlouhodobé zhodnocení.</p>
+              <div class="term-example"><strong>Příklad:</strong> Spořák s 3,5 % ročně při inflaci 4 % = reálně ztrácíš 0,5 % ročně. Dobrý pro rezervu, špatný pro investování.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Spo%C5%99ic%C3%AD_%C3%BA%C4%8Det" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Komodita</span><span class="term-en">Commodity</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Fyzická surovina obchodovaná na burze — zlato, ropa, pšenice, měď. Slouží jako uchovatel hodnoty nebo hedge proti inflaci. Investovat lze přes ETF nebo futures kontrakty.</p>
+              <div class="term-example"><strong>Příklad:</strong> Zlato se tradičně drží hodnoty při inflaci a krizi. Mnoho investorů drží 5–10 % portfolia ve zlatě jako pojistku.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Komodita" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Derivát</span><span class="term-en">Derivative</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Finanční instrument jehož hodnota se odvíjí od jiného aktiva (akcie, index, měna). Patří sem opce, futures, CFD. Určené pro pokročilé — vysoká páka = vysoké riziko ztráty více než vložíš.</p>
+              <div class="term-example"><strong>Příklad:</strong> CFD na Apple ti umožní "sázet" na pohyb akcie bez jejího vlastnictví. S pákou 1:10 můžeš ztratit 10× více než vložíš.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Deriv%C3%A1t_(finance)" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SEKCE 3: ANALÝZA A METRIKY -->
+      <div class="section" data-section>
+        <div class="section-header">
+          <span class="section-icon">🔢</span>
+          <span class="section-title">Analýza a metriky</span>
+          <span class="section-count">10 pojmů</span>
+        </div>
+        <div class="terms-grid">
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Dividenda</span><span class="term-en">Dividend</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Část zisku firmy vyplacená akcionářům — zpravidla čtvrtletně nebo ročně. Dividendové akcie jsou oblíbené pro pasivní příjem. Dividendový výnos = roční dividenda / cena akcie.</p>
+              <div class="term-example"><strong>Příklad:</strong> Vlastníš 100 akcií Coca-Cola za 60 $ každá. Roční dividenda je 1,84 $/akcii = dostaneš 184 $ ročně.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Dividenda" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Tržní kapitalizace</span><span class="term-en">Market Cap</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Celková tržní hodnota firmy = cena akcie × počet akcií. Rozděluje firmy na: Large Cap (velké, stabilní), Mid Cap (střední), Small Cap (malé, rizikovější ale s větším potenciálem).</p>
+              <div class="term-example"><strong>Příklad:</strong> Apple má ~200 mld. akcií × 200 $ = tržní kapitalizace ~3 biliony $. Je to největší firma světa.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Tr%C5%BEn%C3%AD_kapitalizace" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">P/E ratio</span><span class="term-en">Price-to-Earnings Ratio</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Poměr ceny akcie k zisku na akcii. Říká kolik platíš za 1 Kč zisku firmy. Nízké P/E = akcie může být levná (nebo firma má problémy). Vysoké P/E = akcie je drahá nebo investoři očekávají rychlý růst.</p>
+              <div class="term-example"><strong>Příklad:</strong> Akcie stojí 100 $ a firma vydělá 5 $/akcii. P/E = 20. Průměrné P/E S&P 500 je historicky ~16–18.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/P/E_ratio" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Volatilita</span><span class="term-en">Volatility</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Míra kolísání ceny aktiva. Vysoká volatilita = velké výkyvy nahoru i dolů. Kryptoměny mají velmi vysokou volatilitu, státní dluhopisy nízkou. Volatilita ≠ riziko, ale jsou silně provázané.</p>
+              <div class="term-example"><strong>Příklad:</strong> Bitcoin může za den klesnout o 10 %. Akcie velkých firem typicky kolísají o 1–3 % denně.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Volatilita" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Beta</span><span class="term-en">Beta</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Měří jak moc se akcie pohybuje ve srovnání s trhem (benchmarkem). Beta = 1 = pohybuje se jako trh. Beta > 1 = pohybuje se více (riskantnější). Beta < 1 = méně (stabilnější).</p>
+              <div class="term-example"><strong>Příklad:</strong> Akcie s beta 1,5: když trh klesne o 10 %, tato akcie klesne o 15 %. Ale když trh roste o 10 %, roste o 15 %.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Beta_(finance)" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">TER (poplatek fondu)</span><span class="term-en">Total Expense Ratio</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Celkový roční poplatek ETF nebo podílového fondu. Odečítá se automaticky z hodnoty fondu. Čím nižší, tím lépe. Dobré ETF mají TER 0,07–0,2 %. Aktivní fondy mívají 1–2,5 %.</p>
+              <div class="term-example"><strong>Příklad:</strong> ETF s TER 0,2 % na 100 000 Kč = platíš 200 Kč ročně. Aktivní fond s TER 2 % = platíš 2 000 Kč ročně.</div>
+              <a class="term-link" href="https://en.wikipedia.org/wiki/Total_expense_ratio" target="_blank" rel="noopener">Wikipedia (EN) →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Drawdown</span><span class="term-en">Drawdown</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Maximální pokles hodnoty portfolia od vrcholu do dna. Ukazuje jak moc "bolelo" v nejhorším období. Historický max drawdown S&P 500 byl -57 % v roce 2009. Důležitá metrika pro pochopení rizika.</p>
+              <div class="term-example"><strong>Příklad:</strong> Portfolio mělo hodnotu 200 000 Kč, kleslo na 140 000 Kč. Max drawdown = -30 %.</div>
+              <a class="term-link" href="https://en.wikipedia.org/wiki/Drawdown_(economics)" target="_blank" rel="noopener">Wikipedia (EN) →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Sharpe ratio</span><span class="term-en">Sharpe Ratio</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Měří výnos portfolia v poměru k podstoupené rizikovosti. Čím vyšší, tím lépe. Sharpe > 1 je dobrý, > 2 je výborný. Pomáhá porovnávat investice s různými riziky.</p>
+              <div class="term-example"><strong>Příklad:</strong> Portfolio A vydělalo 10 % s vysokou volatilitou (Sharpe 0,8). Portfolio B vydělalo 7 % s nízkou volatilitou (Sharpe 1,4). Portfolio B je efektivnější.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Sharpe%C5%AFv_pom%C4%9Br" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Benchmarking</span><span class="term-en">Benchmarking</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Srovnání výkonnosti investice s referenčním indexem (benchmarkem). Benchmark pro globální akcie je MSCI World. Pokud tvůj fond zaostává za benchmarkem, platíš správce zbytečně.</p>
+              <div class="term-example"><strong>Příklad:</strong> Aktivní fond vydělal 6 %. MSCI World (benchmark) vydělal 10 %. Fond zaostal o 4 % — nedosáhl benchmarku.</div>
+              <a class="term-link" href="https://en.wikipedia.org/wiki/Benchmarking" target="_blank" rel="noopener">Wikipedia (EN) →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Výnosová křivka</span><span class="term-en">Yield Curve</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Graf zobrazující výnosy dluhopisů různých splatností. Normálně stoupá (dlouhé dluhopisy = vyšší výnos). Invertovaná křivka (krátkodobé > dlouhodobé výnosy) historicky předchází recesi.</p>
+              <div class="term-example"><strong>Příklad:</strong> 2-leté státní dluhopisy USA nesou 5 %, 10-leté jen 4,5 % — to je invertovaná křivka, signál možné recese.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/V%C3%BDnosov%C3%A1_k%C5%99ivka" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SEKCE 4: RIZIKO A STRATEGIE -->
+      <div class="section" data-section>
+        <div class="section-header">
+          <span class="section-icon">⚖️</span>
+          <span class="section-title">Riziko a strategie</span>
+          <span class="section-count">8 pojmů</span>
+        </div>
+        <div class="terms-grid">
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Bear market</span><span class="term-en">Bear Market</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Medvědí trh — pokles trhu o 20 % nebo více od nedávného vrcholu. Typicky trvá měsíce až roky. Psychologicky náročný, ale pro dlouhodobé investory je to příležitost nakoupit levněji.</p>
+              <div class="term-example"><strong>Příklad:</strong> V roce 2022 klesl S&P 500 o ~25 % — to byl bear market. Kdo pravidelně nakupoval, koupil levněji.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Medv%C4%9Bd%C3%AD_trh" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Bull market</span><span class="term-en">Bull Market</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Býčí trh — dlouhodobý růst trhu o 20 % nebo více. Typicky trvá roky. Nejdelší bull market v historii byl 2009–2020 (přes 10 let nepřerušeného růstu S&P 500).</p>
+              <div class="term-example"><strong>Příklad:</strong> S&P 500 rostl od března 2009 do února 2020 o více než 400 % — to byl historicky nejdelší bull market.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/B%C3%BD%C4%8D%C3%AD_trh" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">DCA (průměrování nákladů)</span><span class="term-en">Dollar-Cost Averaging</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Strategie pravidelného investování pevné částky bez ohledu na aktuální cenu. Při nízkých cenách koupíš více, při vysokých méně — průměruješ nákupní cenu. Eliminuje chybu "špatného načasování".</p>
+              <div class="term-example"><strong>Příklad:</strong> Každý měsíc investuješ 2 000 Kč do ETF bez ohledu na to zda trh roste nebo klesá. To je DCA.</div>
+              <a class="term-link" href="https://en.wikipedia.org/wiki/Dollar_cost_averaging" target="_blank" rel="noopener">Wikipedia (EN) →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Hedge</span><span class="term-en">Hedge / Hedging</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Pojištění investice proti ztrátě — otevřeš protichůdnou pozici která vydělá pokud tvá hlavní investice ztratí. Používají ho profesionálové pro ochranu portfolia. Zlato je klasický hedge proti inflaci.</p>
+              <div class="term-example"><strong>Příklad:</strong> Vlastníš akcie v USD, ale žiješ v ČR. Nakoupíš měnový hedge aby tě nepoškodilo posílení koruny vůči dolaru.</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Zaji%C5%A1t%C4%9Bn%C3%AD_(finance)" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Investiční horizont</span><span class="term-en">Investment Horizon</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Jak dlouho plánuješ peníze investovat před jejich použitím. Čím delší horizont, tím více rizika si můžeš dovolit. Krátký horizont (do 2 let) = konzervativní přístup. Dlouhý (10+ let) = agresivnější.</p>
+              <div class="term-example"><strong>Příklad:</strong> Spoříš na důchod za 30 let — dlouhý horizont, můžeš mít 90 % v akciích. Spoříš na auto za 2 roky — krátký horizont, spořák nebo dluhopisy.</div>
+              <a class="term-link" href="https://en.wikipedia.org/wiki/Investment_horizon" target="_blank" rel="noopener">Wikipedia (EN) →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Páka</span><span class="term-en">Leverage</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Investování vypůjčených peněz — zesiluje zisky i ztráty. Páka 1:10 znamená, že ovládáš 10× větší pozici než máš vlastního kapitálu. Extrémně riskantní pro začátečníky.</p>
+              <div class="term-example"><strong>Příklad:</strong> Vložíš 10 000 Kč s pákou 1:10. Ovládáš pozici za 100 000 Kč. Pokles o 10 % = ztratíš celých 10 000 Kč (100 %).</div>
+              <a class="term-link" href="https://cs.wikipedia.org/wiki/Finan%C4%8Dn%C3%AD_p%C3%A1ka" target="_blank" rel="noopener">Wikipedia →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Rizikový profil</span><span class="term-en">Risk Profile</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Kombinace tvé ochoty a schopnosti nést riziko. Závisí na věku, příjmu, cílech a psychologii. Konzervativní profil = stabilita nad výnosem. Agresivní profil = maximální výnos za cenu volatility.</p>
+              <div class="term-example"><strong>Příklad:</strong> 25letý s jistým příjmem a horizontem 30 let může mít agresivní profil (90 % akcie). 60letý před důchodem konzervativní (50 % dluhopisy).</div>
+              <a class="term-link" href="https://en.wikipedia.org/wiki/Risk_appetite" target="_blank" rel="noopener">Wikipedia (EN) →</a>
+            </div>
+          </div>
+
+          <div class="term-card" onclick="toggle(this)">
+            <div class="term-header">
+              <div><span class="term-name">Stop-loss</span><span class="term-en">Stop-Loss</span></div>
+              <span class="term-arrow">▼</span>
+            </div>
+            <div class="term-body">
+              <p class="term-desc">Automatický příkaz k prodeji aktiva pokud jeho cena klesne na stanovenou úroveň. Omezuje maximální ztrátu. Používají ho aktivní obchodníci — pro pasivní DCA investory není nutný.</p>
+              <div class="term-example"><strong>Příklad:</strong> Koupíš akcii za 100 $. Nastavíš stop-loss na 85 $. Pokud cena klesne na 85 $, akcie se automaticky prodá — maximální ztráta je 15 %.</div>
+              <a class="term-link" href="https://en.wikipedia.org/wiki/Order_(exchange)#Stop_orders" target="_blank" rel="noopener">Wikipedia (EN) →</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="no-results" id="noResults">Žádný pojem nenalezen. Zkus jiný výraz.</div>
+
+    <div class="bottom-cta">
+      <h3>Teď víš co pojmy znamenají</h3>
+      <p>Zjisti jaká investiční strategie sedí přesně tvé situaci — kvíz ti to řekne za 3 minuty.</p>
+      <a href="/kviz" class="cta-btn">Spustit kvíz →</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="f-logo">investicni<span>test</span>.cz</div>
+    <div class="f-disc">Obsah tohoto webu má pouze informační a edukační charakter. Neposkytujeme investiční poradenství ve smyslu zákona č. 256/2004 Sb. Investování je spojeno s rizikem ztráty vložených prostředků.</div>
+    <div class="f-disc">Některé odkazy na tomto webu jsou affiliate odkazy. Pokud se přes ně zaregistruješ, můžeme obdržet provizi — bez jakýchkoliv dodatečných nákladů pro tebe.</div>
+  </footer>
+
+  <script>
+    function toggle(card) {
+      card.classList.toggle('open');
+    }
+
+    const searchInput = document.getElementById('searchInput');
+    const noResults = document.getElementById('noResults');
+
+    searchInput.addEventListener('input', function() {
+      const q = this.value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.term-card');
+      const sections = document.querySelectorAll('[data-section]');
+      let totalVisible = 0;
+
+      cards.forEach(card => {
+        const name = card.querySelector('.term-name').textContent.toLowerCase();
+        const en = card.querySelector('.term-en').textContent.toLowerCase();
+        const desc = card.querySelector('.term-desc') ? card.querySelector('.term-desc').textContent.toLowerCase() : '';
+        const match = !q || name.includes(q) || en.includes(q) || desc.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) totalVisible++;
+        if (match && q) card.classList.add('open');
+        if (!q) card.classList.remove('open');
+      });
+
+      // Hide empty sections
+      sections.forEach(section => {
+        const visible = [...section.querySelectorAll('.term-card')].some(c => c.style.display !== 'none');
+        section.style.display = visible ? '' : 'none';
+      });
+
+      noResults.classList.toggle('visible', totalVisible === 0 && q.length > 0);
+    });
+  </script>
+</body>
+</html>
