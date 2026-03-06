@@ -62,6 +62,8 @@
     .input-row { display: flex; align-items: center; gap: 0.75rem; }
     .input-field { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 0.875rem 1.25rem; color: #f0ede8; font-family: 'DM Sans', sans-serif; font-size: 1rem; outline: none; transition: border-color 0.2s; -moz-appearance: textfield; }
     .input-field::-webkit-outer-spin-button, .input-field::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
     .input-field:focus { border-color: rgba(200,169,110,0.5); }
     .input-unit { color: rgba(240,237,232,0.4); font-size: 0.85rem; min-width: 2rem; text-align: right; }
 
@@ -315,10 +317,19 @@
                   </div>
                 </div>
                 <div style={{background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.07)',borderRadius:'16px',padding:'1.25rem',marginBottom:'1.75rem'}}>
-                  <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(240,237,232,0.35)',marginBottom:'0.875rem'}}>Nominálně vs. reálně po inflaci</div>
+                  <div style={{fontSize:'0.68rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(240,237,232,0.35)',marginBottom:'0.5rem'}}>Nominálně vs. reálně po inflaci</div>
+                  <div style={{fontSize:'0.78rem',color:'rgba(240,237,232,0.35)',marginBottom:'0.875rem',lineHeight:1.5}}>Nominální hodnota je co uvidíš na účtu. Reálná hodnota říká, kolik si za to reálně koupíš — v dnešních cenách.</div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem',marginBottom:'0.875rem'}}>
-                    <div><div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Nominální hodnota</div><div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:900,color:'#c8a96e'}}>{formatCZK(result.total)}</div></div>
-                    <div><div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Reálná hodnota (po inflaci)</div><div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:900,color:realProfit>0?'#4a7c59':'#e07a78'}}>{formatCZK(realTotal)}</div></div>
+                    <div>
+                      <div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Nominální hodnota</div>
+                      <div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:900,color:'#c8a96e'}}>{formatCZK(result.total)}</div>
+                      <div style={{fontSize:'0.68rem',color:'rgba(240,237,232,0.3)',marginTop:'0.2rem'}}>Co vidíš na účtu</div>
+                    </div>
+                    <div>
+                      <div style={{fontSize:'0.7rem',color:'rgba(240,237,232,0.4)',marginBottom:'0.25rem'}}>Reálná hodnota (po inflaci)</div>
+                      <div style={{fontFamily:"'Playfair Display',serif",fontSize:'1.1rem',fontWeight:900,color:realProfit>0?'#4a7c59':'#e07a78'}}>{formatCZK(realTotal)}</div>
+                      <div style={{fontSize:'0.68rem',color:'rgba(240,237,232,0.3)',marginTop:'0.2rem'}}>Kupní síla v dnešních cenách</div>
+                    </div>
                   </div>
                   <div style={{height:'1px',background:'rgba(255,255,255,0.05)',margin:'0.875rem 0'}} />
                   <div style={{fontSize:'0.82rem',color:'rgba(240,237,232,0.5)'}}>

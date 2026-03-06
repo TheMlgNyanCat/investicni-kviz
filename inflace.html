@@ -53,6 +53,9 @@
     .slider-row { display: flex; align-items: center; gap: 1rem; }
     .slider { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.1); outline: none; cursor: pointer; }
     .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #e07a78; cursor: pointer; box-shadow: 0 0 8px rgba(192,80,77,0.4); }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
     .slider-value { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: #e07a78; min-width: 3.5rem; text-align: right; }
     .label-row { display: flex; align-items: center; gap: 0.5rem; }
     .tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
